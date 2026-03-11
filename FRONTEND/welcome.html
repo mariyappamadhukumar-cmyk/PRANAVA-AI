@@ -1,1418 +1,1118 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🏥 MediCare Health Platform</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --primary: #4169E1;
-      --primary-dark: #1E90FF;
-      --secondary: #8B5CF6;
-      --accent: #10b981;
-      --bg-gradient-1: #FFE4E6;
-      --bg-gradient-2: #FFCCD5;
-      --card-bg: rgba(255, 255, 255, 0.25);
-      --border: rgba(65, 105, 225, 0.3);
-      --text-primary: #1f2937;
-      --text-secondary: #4b5563;
-    }
-
-    html, body {
-      height: 100%;
-      overflow-x: hidden;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-      position: relative;
-    }
-
-    /* Animated background particles */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 25% 25%, rgba(100, 149, 237, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(65, 105, 225, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.10) 0%, transparent 50%);
-      z-index: -1;
-      animation: gradient 15s ease infinite;
-      background-size: 400% 400%;
-    }
-
-    @keyframes gradient {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 60px;
-      animation: fadeInDown 0.8s ease-out;
-      position: relative;
-    }
-
-    .auth-button {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(65, 105, 225, 0.3);
-    }
-
-    .auth-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(65, 105, 225, 0.4);
-    }
-
-    .auth-button.logout {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-    }
-
-    .user-greeting {
-      position: absolute;
-      top: 5px;
-      right: 150px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-    }
-
-    .user-avatar {
-      width: 35px;
-      height: 35px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .user-name {
-      font-weight: 600;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-    }
-
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 25px;
-      margin-bottom: 25px;
-      animation: logoEntrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    @keyframes logoEntrance {
-      0% {
-        opacity: 0;
-        transform: scale(0) rotate(-180deg);
-      }
-      60% {
-        transform: scale(1.1) rotate(10deg);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-      }
-    }
-
-    .main-logo {
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 50px;
-      box-shadow: 
-        0 20px 60px rgba(99, 102, 241, 0.4),
-        0 0 0 10px rgba(255, 255, 255, 0.1),
-        0 0 0 20px rgba(255, 255, 255, 0.05);
-      animation: logoFloat 3s ease-in-out infinite;
-      position: relative;
-    }
-
-    .main-logo::before {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-      border-radius: 35px;
-      z-index: -1;
-      opacity: 0.5;
-      filter: blur(20px);
-      animation: glowPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes logoFloat {
-      0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-15px) rotate(5deg);
-      }
-    }
-
-    @keyframes glowPulse {
-      0%, 100% {
-        opacity: 0.5;
-        transform: scale(1);
-      }
-      50% {
-        opacity: 0.8;
-        transform: scale(1.1);
-      }
-    }
-
-    h1 {
-      font-size: 3.5rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, #fff, #f0f0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 15px;
-      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      letter-spacing: -1px;
-      animation: titleShine 3s ease-in-out infinite;
-    }
-
-    @keyframes titleShine {
-      0%, 100% {
-        filter: brightness(1);
-      }
-      50% {
-        filter: brightness(1.2);
-      }
-    }
-
-    .subtitle {
-      font-size: 1.3rem;
-      color: rgba(255, 255, 255, 0.9);
-      font-weight: 500;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      animation: subtitleFade 2s ease-out;
-    }
-
-    @keyframes subtitleFade {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Options Grid */
-    .options-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 35px;
-      max-width: 1200px;
-      margin: 0 auto;
-      perspective: 1000px;
-    }
-
-    .option-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(30px);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      border-radius: 30px;
-      padding: 45px 35px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-      position: relative;
-      overflow: hidden;
-      animation: fadeInUp 0.8s ease-out backwards;
-      transform-style: preserve-3d;
-    }
-
-    .option-card:nth-child(1) { animation-delay: 0.1s; }
-    .option-card:nth-child(2) { animation-delay: 0.2s; }
-    .option-card:nth-child(3) { animation-delay: 0.3s; }
-    .option-card:nth-child(4) { animation-delay: 0.4s; }
-    .option-card:nth-child(5) { animation-delay: 0.5s; }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(60px) rotateX(-20deg);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0deg);
-      }
-    }
-
-    /* Gradient overlay on hover */
-    .option-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      border-radius: 30px;
-    }
-
-    .option-card:hover::before {
-      opacity: 1;
-    }
-
-    /* Animated border effect */
-    .option-card::after {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899, #14b8a6);
-      background-size: 300% 300%;
-      border-radius: 30px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      animation: gradientRotate 3s ease infinite;
-    }
-
-    @keyframes gradientRotate {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .option-card:hover::after {
-      opacity: 1;
-    }
-
-    .option-card:hover {
-      transform: translateY(-15px) scale(1.03) rotateX(5deg);
-      box-shadow: 
-        0 25px 70px rgba(99, 102, 241, 0.3),
-        0 10px 30px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      border-color: rgba(99, 102, 241, 0.5);
-    }
-
-    .option-card:active {
-      transform: translateY(-10px) scale(1.01);
-    }
-
-    .option-icon {
-      font-size: 5rem;
-      margin-bottom: 25px;
-      display: inline-block;
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
-      position: relative;
-    }
-
-    .option-card:hover .option-icon {
-      transform: scale(1.25) rotate(10deg) translateY(-10px);
-      filter: drop-shadow(0 10px 25px rgba(99, 102, 241, 0.4));
-    }
-
-    /* Icon glow effect */
-    .option-icon::after {
-      content: attr(data-icon);
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      filter: blur(20px);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .option-card:hover .option-icon::after {
-      opacity: 0.6;
-    }
-
-    .option-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 18px;
-      background: linear-gradient(135deg, #1f2937, #4b5563);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transition: all 0.3s ease;
-    }
-
-    .option-card:hover .option-title {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transform: scale(1.05);
-    }
-
-    .option-description {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 25px;
-      transition: color 0.3s ease;
-    }
-
-    .option-card:hover .option-description {
-      color: var(--text-primary);
-    }
-
-    .option-badge {
-      display: inline-block;
-      padding: 8px 20px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: white;
-      border-radius: 50px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-top: 12px;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .option-card:hover .option-badge {
-      transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
-    }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 80px;
-      padding: 25px;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 0.95rem;
-      animation: fadeIn 2s ease-out;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .footer p:first-child {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    /* Stats Section */
-    .stats-section {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin: 40px 0 60px 0;
-      flex-wrap: wrap;
-      animation: fadeInUp 1s ease-out 0.6s backwards;
-    }
-
-    .stat-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-radius: 25px;
-      padding: 30px 40px;
-      text-align: center;
-      min-width: 180px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
-      animation: shimmer 2s linear infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 50px rgba(99, 102, 241, 0.3);
-    }
-
-    .stat-number {
-      font-size: 3rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .stat-label {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Floating shapes decoration */
-    .floating-shapes {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .shape {
-      position: absolute;
-      opacity: 0.1;
-      animation: float 20s infinite ease-in-out;
-    }
-
-    .shape:nth-child(1) {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border-radius: 50%;
-      top: 10%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-
-    .shape:nth-child(2) {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      border-radius: 30%;
-      top: 60%;
-      right: 10%;
-      animation-delay: 2s;
-    }
-
-    .shape:nth-child(3) {
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, #14b8a6, #6366f1);
-      border-radius: 20%;
-      bottom: 10%;
-      left: 15%;
-      animation-delay: 4s;
-    }
-
-    .shape:nth-child(4) {
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, #f59e0b, #ec4899);
-      border-radius: 50%;
-      top: 30%;
-      right: 20%;
-      animation-delay: 1s;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-      25% {
-        transform: translateY(-30px) rotate(90deg);
-      }
-      50% {
-        transform: translateY(0) rotate(180deg);
-      }
-      75% {
-        transform: translateY(30px) rotate(270deg);
-      }
-    }
-
-    /* Wave animation at bottom */
-    .waves {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 200px;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .wave {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 200%;
-      height: 100%;
-      background-repeat: repeat-x;
-      animation: wave 25s linear infinite;
-    }
-
-    .wave:nth-child(1) {
-      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
-      animation-duration: 25s;
-      opacity: 0.7;
-    }
-
-    .wave:nth-child(2) {
-      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-      animation-duration: 20s;
-      animation-delay: -5s;
-      opacity: 0.5;
-    }
-
-    .wave:nth-child(3) {
-      background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.1), transparent);
-      animation-duration: 30s;
-      animation-delay: -2s;
-      opacity: 0.3;
-    }
-
-    @keyframes wave {
-      0% {
-        transform: translateX(0) translateZ(0) scaleY(1);
-      }
-      50% {
-        transform: translateX(-25%) translateZ(0) scaleY(0.8);
-      }
-      100% {
-        transform: translateX(-50%) translateZ(0) scaleY(1);
-      }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container {
-        padding: 20px 15px;
-        justify-content: flex-start;
-      }
-
-      h1 {
-        font-size: 1.8rem;
-        letter-spacing: -0.5px;
-      }
-
-      .subtitle {
-        font-size: 0.95rem;
-      }
-
-      .main-logo {
-        width: 70px;
-        height: 70px;
-        font-size: 35px;
-      }
-
-      .logo-section {
-        gap: 15px;
-        margin-bottom: 15px;
-      }
-
-      .header {
-        margin-bottom: 30px;
-        padding-top: 60px;
-      }
-
-      .auth-button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: 8px 14px;
-        font-size: 0.82rem;
-      }
-
-      .user-greeting {
-        position: absolute;
-        top: 5px;
-        right: 110px;
-        padding: 6px 10px;
-        font-size: 0.8rem;
-      }
-
-      .user-name {
-        display: none;
-      }
-
-      .options-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .option-card {
-        padding: 25px 20px;
-        border-radius: 20px;
-      }
-
-      .option-card:hover {
-        transform: translateY(-5px) scale(1.01);
-      }
-
-      .option-icon {
-        font-size: 3.2rem;
-        margin-bottom: 15px;
-      }
-
-      .option-title {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-      }
-
-      .option-description {
-        font-size: 0.9rem;
-      }
-
-      .stats-section {
-        gap: 12px;
-        margin: 25px 0 35px 0;
-      }
-
-      .stat-card {
-        min-width: 120px;
-        padding: 18px 20px;
-        border-radius: 18px;
-        flex: 1;
-      }
-
-      .stat-number {
-        font-size: 2rem;
-      }
-
-      .stat-label {
-        font-size: 0.75rem;
-      }
-
-      .footer {
-        margin-top: 40px;
-        font-size: 0.85rem;
-      }
-
-      .floating-shapes {
-        display: none;
-      }
-
-      .waves {
-        height: 100px;
-      }
-    }
-
-    @media (max-width: 400px) {
-      h1 { font-size: 1.5rem; }
-      .options-grid { gap: 12px; }
-      .option-card { padding: 20px 15px; }
-      .stat-card { min-width: 100px; padding: 14px 12px; }
-      .stat-number { font-size: 1.6rem; }
-    }
-
-    /* Loading animation */
-    .loading {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none;
-      align-items: center;
-      gap: 10px;
-      background: white;
-      padding: 20px 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
-
-    .loading.active {
-      display: flex;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(65, 105, 225, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Hamburger Menu Button */
-    .menu-toggle {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      z-index: 1001;
-      box-shadow: 0 4px 15px rgba(65, 105, 225, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .menu-toggle:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(65, 105, 225, 0.4);
-    }
-
-    .menu-toggle span {
-      width: 24px;
-      height: 3px;
-      background: white;
-      border-radius: 2px;
-      transition: all 0.3s ease;
-    }
-
-    .menu-toggle.active span:nth-child(1) {
-      transform: translateY(9px) rotate(45deg);
-    }
-
-    .menu-toggle.active span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .menu-toggle.active span:nth-child(3) {
-      transform: translateY(-9px) rotate(-45deg);
-    }
-
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -320px;
-      width: 320px;
-      height: 100vh;
-      background: white;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      transition: left 0.3s ease;
-      overflow-y: auto;
-    }
-
-    .sidebar.active {
-      left: 0;
-    }
-
-    .sidebar-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .sidebar-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .sidebar-header {
-      background: linear-gradient(135deg, #4169E1, #8B5CF6);
-      color: white;
-      padding: 25px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .sidebar-logo-icon {
-      font-size: 2.5em;
-    }
-
-    .sidebar-logo-text h3 {
-      font-size: 1.3em;
-      margin: 0;
-      font-weight: 700;
-    }
-
-    .sidebar-logo-text p {
-      font-size: 0.85em;
-      margin: 0;
-      opacity: 0.9;
-    }
-
-    .sidebar-menu {
-      padding: 20px 0;
-    }
-
-    .menu-section-title {
-      padding: 15px 20px 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px 20px;
-      color: #333;
-      text-decoration: none;
-      border-left: 4px solid transparent;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .menu-item:hover {
-      background: linear-gradient(90deg, rgba(65, 105, 225, 0.1), transparent);
-      border-left-color: #4169E1;
-    }
-
-    .menu-item.active {
-      background: linear-gradient(90deg, rgba(65, 105, 225, 0.15), rgba(65, 105, 225, 0.05));
-      border-left-color: #4169E1;
-      font-weight: 600;
-    }
-
-    .menu-item-icon {
-      font-size: 20px;
-      width: 24px;
-      text-align: center;
-    }
-
-    .menu-item-text {
-      flex: 1;
-      font-size: 0.95rem;
-    }
-
-    .sidebar-footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      border-top: 1px solid #e9ecef;
-      background: white;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MediCare — AI Health Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--bg2:#111;--bg3:#1a1a1a;
+  --border:rgba(255,255,255,.08);--border-hover:rgba(255,255,255,.18);
+  --text:#fff;--muted:rgba(255,255,255,.5);--dim:rgba(255,255,255,.28);
+  --teal:#0891B2;--teal-lt:#22D3EE;--teal-glow:rgba(8,145,178,.35);
+  --danger:#ef4444;
+}
+html{scroll-behavior:smooth}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden}
+
+/* ===== NAV ===== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;
+  background:rgba(8,8,8,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 28px;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto}
+.nav-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-mark svg{width:16px;height:16px;color:#fff;display:block}
+.nav-brand{font-size:.9rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+.nav-brand b{color:var(--teal-lt)}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:500;
+  padding:6px 12px;border-radius:6px;transition:color .15s,background .15s}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-chip{display:none;align-items:center;gap:8px;padding:5px 11px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;
+  font-size:.8rem;font-weight:600;color:#fff}
+.nav-chip.show{display:flex}
+.nav-av{width:22px;height:22px;border-radius:50%;background:var(--teal);
+  color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn-nav{padding:8px 20px;border-radius:7px;border:1px solid var(--border-hover);
+  cursor:pointer;font-size:.8rem;font-weight:600;letter-spacing:.02em;transition:all .15s}
+.btn-nav.primary{background:#fff;color:#080808;border-color:#fff}
+.btn-nav.primary:hover{background:rgba(255,255,255,.88)}
+.btn-nav.outline{background:transparent;color:var(--danger);border-color:rgba(239,68,68,.3)}
+.btn-nav.outline:hover{background:rgba(239,68,68,.07)}
+.nav-toggle{width:34px;height:34px;border-radius:7px;background:transparent;
+  border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:4px;transition:background .15s;flex-shrink:0}
+.nav-toggle:hover{background:rgba(255,255,255,.06)}
+.nav-toggle span{width:15px;height:1.5px;background:#fff;border-radius:1px;transition:all .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* ===== SIDEBAR ===== */
+.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;
+  background:#111;border-right:1px solid var(--border);z-index:200;
+  transition:left .22s ease;display:flex;flex-direction:column}
+.sidebar.open{left:0}
+.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:199;
+  opacity:0;visibility:hidden;transition:all .22s}
+.sb-overlay.open{opacity:1;visibility:visible}
+.sb-head{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-mark svg{width:16px;height:16px;color:#fff;display:block}
+.sb-title{font-size:.88rem;font-weight:700;color:#fff}
+.sb-sub{font-size:.7rem;color:var(--muted);margin-top:1px}
+.sb-label{padding:16px 20px 6px;font-size:.65rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:12px;padding:10px 20px;
+  color:var(--muted);text-decoration:none;border-left:2px solid transparent;
+  transition:all .15s;font-size:.85rem;font-weight:500;cursor:pointer}
+.sb-item:hover{background:rgba(255,255,255,.04);color:#fff;border-left-color:var(--teal)}
+.sb-item.red{color:rgba(239,68,68,.7)}
+.sb-item.red:hover{background:rgba(239,68,68,.06);border-left-color:var(--danger)}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;display:block}
+.sb-foot{margin-top:auto;border-top:1px solid var(--border);padding:8px 0}
+
+/* ===== PAGE ===== */
+.page{padding-top:64px}
+
+/* ===== HERO ===== */
+.hero{min-height:calc(100vh - 64px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:80px 24px 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(8,145,178,.12) 0%,transparent 70%);
+  pointer-events:none}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;
+  font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--teal-lt);margin-bottom:32px;
+  padding:6px 16px;border:1px solid rgba(34,211,238,.2);border-radius:100px;
+  background:rgba(34,211,238,.06)}
+.hero-eyebrow svg{width:11px;height:11px;display:block}
+.hero-h1{font-size:clamp(3rem,7vw,5.5rem);font-weight:900;line-height:1.05;
+  letter-spacing:-.04em;color:#fff;margin-bottom:16px}
+.hero-p{font-size:1.05rem;color:var(--muted);max-width:480px;margin:0 auto 48px;line-height:1.75;font-weight:400}
+.hero-ctas{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:64px}
+.btn-hero-p{padding:13px 28px;background:#fff;color:#080808;border:none;
+  border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:background .15s,transform .15s}
+.btn-hero-p:hover{background:rgba(255,255,255,.88);transform:translateY(-1px)}
+.btn-hero-s{padding:13px 28px;background:transparent;color:#fff;
+  border:1px solid var(--border-hover);border-radius:8px;font-size:.88rem;
+  font-weight:600;cursor:pointer;transition:background .15s,transform .15s}
+.btn-hero-s:hover{background:rgba(255,255,255,.06);transform:translateY(-1px)}
+
+/* STATS */
+.stats{display:flex;gap:0;border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;background:rgba(255,255,255,.03)}
+.stat{flex:1;min-width:110px;padding:22px 32px;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-n{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.03em;display:block;line-height:1}
+.stat-n b{color:var(--teal-lt)}
+.stat-l{font-size:.65rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-top:5px}
+
+/* SCROLL HINT */
+.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--dim);font-size:.65rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:48px;animation:bob 2s ease-in-out infinite}
+.scroll-hint svg{width:18px;height:18px;display:block}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ===== PLASMA CANVAS ===== */
+#plasmaCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;
+  pointer-events:none;z-index:0;opacity:.28}
+.hero>*:not(#plasmaCanvas){position:relative;z-index:1}
+
+/* TRUE FOCUS */
+.focus-container{position:relative;display:flex;gap:.3em;justify-content:center;
+  align-items:baseline;flex-wrap:wrap;outline:none;user-select:none;margin-bottom:16px}
+.focus-word{position:relative;font-size:clamp(3rem,7vw,5.5rem);font-weight:900;
+  color:#fff;letter-spacing:-.04em;line-height:1.05;cursor:default;
+  transition:filter .45s ease,color .45s ease;outline:none;user-select:none}
+.focus-word.active{filter:blur(0)!important;color:var(--teal-lt)}
+.focus-frame{position:absolute;top:0;left:0;pointer-events:none;box-sizing:content-box;border:none;
+  transition:transform .45s cubic-bezier(.4,0,.2,1),width .45s cubic-bezier(.4,0,.2,1),
+  height .45s cubic-bezier(.4,0,.2,1),opacity .4s ease}
+.f-corner{position:absolute;width:14px;height:14px;border:2px solid var(--teal-lt);
+  filter:drop-shadow(0 0 6px var(--teal-lt));border-radius:2px}
+.f-corner.tl{top:-8px;left:-8px;border-right:none;border-bottom:none}
+.f-corner.tr{top:-8px;right:-8px;border-left:none;border-bottom:none}
+.f-corner.bl{bottom:-8px;left:-8px;border-right:none;border-top:none}
+.f-corner.br{bottom:-8px;right:-8px;border-left:none;border-top:none}
+
+/* ===== SECTION SHARED ===== */
+.section{padding:100px 24px}
+.section-inner{max-width:1100px;margin:0 auto}
+.sec-tag{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);border:1px solid var(--border);
+  padding:5px 14px;border-radius:100px;margin-bottom:40px}
+.sec-heading{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;
+  letter-spacing:-.03em;line-height:1.15;margin-bottom:16px}
+.sec-sub{font-size:1rem;color:var(--muted);max-width:520px;line-height:1.75;margin-bottom:56px}
+.divider{height:1px;background:var(--border);margin:0}
+
+/* ===== NUMBERED LIST ===== */
+.num-list{display:flex;flex-direction:column;gap:0}
+.num-item{display:grid;grid-template-columns:80px 1fr;align-items:start;
+  padding:32px 0;border-bottom:1px solid var(--border)}
+.num-item:last-child{border-bottom:none}
+.num-idx{font-size:.72rem;font-weight:700;color:var(--dim);letter-spacing:.08em;
+  font-variant-numeric:tabular-nums;padding-top:4px}
+.num-body h3{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:6px}
+.num-body p{font-size:.88rem;color:var(--muted);line-height:1.7}
+
+/* ===== ZIGZAG FEATURE ROWS ===== */
+.feat-list{display:flex;flex-direction:column;gap:24px}
+.feat-row{display:flex;flex-direction:row;align-items:stretch;
+  border:1px solid var(--border);border-radius:16px;overflow:hidden;
+  cursor:pointer;transition:border-color .2s,box-shadow .2s;min-height:340px}
+.feat-row:hover{border-color:rgba(8,145,178,.35);box-shadow:0 0 40px rgba(8,145,178,.06)}
+.feat-row.reverse{flex-direction:row-reverse}
+/* Visual panel — dark teal-tinted side with big icon */
+.feat-visual{flex:0 0 45%;background:rgba(8,145,178,.06);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  justify-content:center;align-items:flex-start;padding:52px 48px;gap:0;
+  position:relative;overflow:hidden}
+.feat-row.reverse .feat-visual{border-right:none;border-left:1px solid var(--border)}
+.feat-visual::before{content:'';position:absolute;top:-60px;right:-60px;
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(8,145,178,.12) 0%,transparent 70%);pointer-events:none}
+.feat-num{font-size:.7rem;font-weight:700;color:var(--dim);letter-spacing:.12em;margin-bottom:24px}
+.feat-big-ic{width:80px;height:80px;border-radius:18px;background:rgba(8,145,178,.12);
+  border:1px solid rgba(8,145,178,.25);color:var(--teal-lt);
+  display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+.feat-big-ic svg{width:36px;height:36px;display:block}
+.feat-title{font-size:1.7rem;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
+.badge{display:inline-block;padding:5px 12px;border-radius:6px;font-size:.6rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;align-self:flex-start}
+.badge.teal{background:rgba(8,145,178,.15);color:var(--teal-lt);border:1px solid rgba(8,145,178,.25)}
+.badge.green{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.badge.amber{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2)}
+/* Text panel */
+.feat-text{flex:1;padding:52px 48px;display:flex;flex-direction:column;justify-content:center;background:var(--bg2)}
+.feat-desc{font-size:1rem;line-height:1.85;color:var(--muted);margin-bottom:32px;max-width:420px}
+.feat-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;
+  background:#fff;color:#080808;border-radius:100px;font-size:.85rem;font-weight:700;
+  border:none;cursor:pointer;transition:background .15s,transform .15s;align-self:flex-start}
+.feat-btn:hover{background:rgba(255,255,255,.88);transform:translateY(-1px)}
+.feat-btn svg{width:14px;height:14px;display:block;transition:transform .18s}
+.feat-row:hover .feat-btn svg{transform:translateX(4px)}
+@media(max-width:900px){
+  .feat-row,.feat-row.reverse{flex-direction:column}
+  .feat-visual{flex:none;border-right:none!important;border-left:none!important;border-bottom:1px solid var(--border);padding:40px 28px}
+  .feat-text{padding:40px 28px}
+}
+
+/* ===== HOW IT WORKS ===== */
+.hiw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;margin-top:16px}
+.hiw-grid::before{content:'';position:absolute;top:36px;left:calc(16.66% + 8px);right:calc(16.66% + 8px);
+  height:1px;background:linear-gradient(90deg,var(--teal),rgba(8,145,178,.2));z-index:0}
+.hiw-step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 24px 0}
+.hiw-num{width:72px;height:72px;border-radius:50%;background:rgba(8,145,178,.1);
+  border:1px solid rgba(8,145,178,.3);display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;color:var(--teal-lt);letter-spacing:-.04em;
+  position:relative;z-index:1;margin-bottom:24px;
+  box-shadow:0 0 28px rgba(8,145,178,.18)}
+.hiw-step:nth-child(2) .hiw-num{background:rgba(8,145,178,.18);border-color:rgba(8,145,178,.5);box-shadow:0 0 40px rgba(8,145,178,.3)}
+.hiw-icon{width:40px;height:40px;color:var(--teal-lt);margin-bottom:16px}
+.hiw-icon svg{width:100%;height:100%;display:block}
+.hiw-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-.02em}
+.hiw-desc{font-size:.84rem;color:var(--muted);line-height:1.7;max-width:220px}
+@media(max-width:700px){
+  .hiw-grid{grid-template-columns:1fr;gap:40px}
+  .hiw-grid::before{display:none}
+  .hiw-step{flex-direction:row;text-align:left;gap:20px;align-items:flex-start}
+  .hiw-num{flex-shrink:0;width:52px;height:52px;font-size:1rem}
+  .hiw-icon{display:none}
+}
+
+/* ===== FEEDBACK ===== */
+.fb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.fb-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:28px 24px;display:flex;flex-direction:column;gap:14px;
+  transition:border-color .2s,box-shadow .2s}
+.fb-card:hover{border-color:rgba(8,145,178,.3);box-shadow:0 0 32px rgba(8,145,178,.07)}
+.fb-stars{display:flex;gap:3px}
+.fb-stars svg{width:14px;height:14px;fill:#fbbf24;color:#fbbf24}
+.fb-quote{font-size:.9rem;color:var(--muted);line-height:1.75;flex:1}
+.fb-author{display:flex;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border)}
+.fb-av{width:36px;height:36px;border-radius:50%;background:rgba(8,145,178,.2);
+  border:1px solid rgba(8,145,178,.3);display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:800;color:var(--teal-lt);flex-shrink:0}
+.fb-name{font-size:.82rem;font-weight:700;color:#fff}
+.fb-role{font-size:.72rem;color:var(--dim)}
+@media(max-width:900px){.fb-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.fb-grid{grid-template-columns:1fr}}
+
+/* ===== FEEDBACK FORM ===== */
+.fb-form-wrap{margin-top:48px;border:1px solid var(--border);border-radius:20px;
+  background:var(--bg2);padding:36px 40px;max-width:680px;margin-left:auto;margin-right:auto}
+.fb-form-wrap h3{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:4px}
+.fb-form-wrap p{font-size:.84rem;color:var(--muted);margin-bottom:28px}
+.fb-star-pick{display:flex;gap:6px;margin-bottom:24px}
+.fb-star-pick svg{width:28px;height:28px;cursor:pointer;color:rgba(255,255,255,.15);
+  fill:rgba(255,255,255,.1);transition:color .15s,fill .15s,transform .15s}
+.fb-star-pick svg:hover,.fb-star-pick svg.on{color:#fbbf24;fill:#fbbf24}
+.fb-star-pick svg:hover{transform:scale(1.2)}
+.fb-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:540px){.fb-row{grid-template-columns:1fr}}
+.fb-input,.fb-textarea{width:100%;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:10px;color:#fff;
+  font-family:inherit;font-size:.88rem;padding:12px 16px;
+  outline:none;transition:border-color .2s,box-shadow .2s;resize:none}
+.fb-input::placeholder,.fb-textarea::placeholder{color:var(--dim)}
+.fb-input:focus,.fb-textarea:focus{border-color:rgba(8,145,178,.5);
+  box-shadow:0 0 0 3px rgba(8,145,178,.12)}
+.fb-textarea{min-height:110px;margin-bottom:16px;line-height:1.6}
+.fb-submit{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;
+  background:var(--teal);color:#fff;border:none;border-radius:100px;
+  font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.01em;
+  transition:background .15s,transform .15s,box-shadow .15s}
+.fb-submit:hover{background:#0e7490;transform:translateY(-1px);box-shadow:0 8px 24px rgba(8,145,178,.3)}
+.fb-submit svg{width:15px;height:15px;transition:transform .18s}
+.fb-submit:hover svg{transform:translateX(3px)}
+.fb-success{display:none;align-items:center;gap:10px;margin-top:16px;
+  padding:12px 18px;border-radius:10px;background:rgba(16,185,129,.1);
+  border:1px solid rgba(16,185,129,.25);color:#34d399;font-size:.85rem;font-weight:600}
+.fb-success.show{display:flex}
+.fb-new{border-color:rgba(8,145,178,.4);box-shadow:0 0 0 2px rgba(8,145,178,.15);
+  animation:fbIn .5s cubic-bezier(.22,1,.36,1)}
+@keyframes fbIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* ===== CTA BAND ===== */
+.cta-band{background:var(--bg2);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);padding:100px 24px;text-align:center}
+.cta-band h2{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;
+  letter-spacing:-.03em;margin-bottom:14px}
+.cta-band p{font-size:.95rem;color:var(--muted);max-width:460px;margin:0 auto 36px;line-height:1.7}
+
+/* ===== FOOTER ===== */
+footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.foot-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.foot-logo span{font-size:.85rem;font-weight:700;color:var(--muted)}
+.foot-logo b{color:var(--teal-lt)}
+.foot-disc{font-size:.72rem;color:var(--dim);text-align:center;max-width:440px;line-height:1.6}
+.foot-copy{font-size:.72rem;color:var(--dim);white-space:nowrap}
+
+/* ===== MODAL ===== */
+#hospModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:500;align-items:center;justify-content:center}
+#hospModal.show{display:flex}
+.modal-box{background:#1a1a1a;border:1px solid var(--border);border-radius:14px;
+  padding:30px;max-width:400px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal-box h3{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:6px}
+.modal-box p{font-size:.84rem;color:var(--muted);margin-bottom:20px}
+.modal-btns{display:flex;gap:9px;flex-wrap:wrap}
+.modal-btn{padding:9px 18px;border-radius:8px;font-weight:600;font-size:.82rem;cursor:pointer;border:none;transition:all .15s}
+.modal-btn.p{background:var(--teal);color:#fff}
+.modal-btn.p:hover{background:#0e7490}
+.modal-btn.g{background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--border)}
+.modal-btn.g:hover{background:rgba(255,255,255,.12)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hero{padding:60px 20px 48px}
+  .section{padding:72px 20px}
+  .stats{flex-direction:column}
+  .stat{border-right:none;border-bottom:1px solid var(--border)}
+  .stat:last-child{border-bottom:none}
+  .num-item{grid-template-columns:56px 1fr}
+  footer{flex-direction:column;text-align:center}
+  .cta-band{padding:64px 20px}
+  .fb-form-wrap{padding:28px 22px}
+  .hiw-desc{max-width:none}
+}
+@media(max-width:480px){
+  .hero-ctas{flex-direction:column;align-items:stretch}
+  .btn-hero-p,.btn-hero-s{text-align:center}
+  .feat-visual,.feat-text{padding:28px 16px!important}
+  .fb-card{padding:20px 16px}
+  .fb-form-wrap{padding:22px 14px}
+  .sec-heading{letter-spacing:-.02em}
+  .focus-word{font-size:clamp(2.2rem,9vw,3.5rem)}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero{animation:fadeUp .5s ease-out}
+/* Variable Proximity — Roboto Flex headings */
+.sec-heading,.feat-title,.cta-band h2{font-family:'Roboto Flex',sans-serif}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+<link rel="stylesheet" href="bento-glow.css">
+<link rel="stylesheet" href="gooey-buttons.css">
 </head>
 <body>
-  <!-- Hamburger Menu Button -->
-  <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
-    <span></span>
-    <span></span>
-    <span></span>
+
+<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+    </div>
+    <div><div class="sb-title">MediCare</div><div class="sb-sub">Health Platform</div></div>
+  </div>
+  <div class="sb-label">Navigation</div>
+  <a href="ai-doctor.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>AI Doctor
+  </a>
+  <a href="ai-chat.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>AI Chat
+  </a>
+  <a href="indexcough.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>Cough Analysis
+  </a>
+  <a href="online-consultation.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-4l-2 4h8l-2-4zM12 12v4M10 14h4"/></svg>Book Doctor
+  </a>
+  <a href="hospital.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nearby Hospitals
+  </a>
+  <a href="health-dashboard.html" class="sb-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Health Dashboard
+  </a>
+  <div class="sb-foot">
+    <div class="sb-item red" onclick="handleAuth()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+    </div>
+  </div>
+</aside>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
   </button>
+  <a href="#" class="nav-logo">
+    <div class="nav-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+    </div>
+    <span class="nav-brand">Medi<b>Care</b></span>
+  </a>
+  <div class="nav-links">
+    <a href="ai-doctor.html">AI Doctor</a>
+    <a href="indexcough.html">Cough Analysis</a>
+    <a href="online-consultation.html">Book Doctor</a>
+    <a href="hospital.html">Hospitals</a>
+    <a href="health-dashboard.html">Dashboard</a>
+  </div>
+  <div class="nav-chip" id="navChip">
+    <div class="nav-av" id="navAv">U</div>
+    <span id="navName">User</span>
+  </div>
+  <button class="btn-nav primary" id="authBtn" onclick="handleAuth()">Sign In</button>
+</nav>
 
-  <!-- Sidebar Overlay -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<main class="page">
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <span class="sidebar-logo-icon">🏥</span>
-        <div class="sidebar-logo-text">
-          <h3>MediCare</h3>
-          <p>Health Platform</p>
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="plasmaCanvas"></canvas>
+    <div class="hero-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+      AI-Powered Healthcare
+    </div>
+    <div class="focus-container" id="trueFocus">
+      <span class="focus-word">Your</span>
+      <span class="focus-word">Intelligent</span>
+      <span class="focus-word">Health</span>
+      <span class="focus-word">Companion</span>
+      <div class="focus-frame" id="focusFrame">
+        <span class="f-corner tl"></span><span class="f-corner tr"></span>
+        <span class="f-corner bl"></span><span class="f-corner br"></span>
+      </div>
+    </div>
+    <p class="hero-p">Advanced AI consultations, real-time diagnostics, and personalised treatment guidance — available around the clock.</p>
+    <div class="hero-ctas">
+      <button class="btn-hero-p" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth',block:'start'})">Get Started Free</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-n"><span id="sAcc">0</span><b>%</b></span>
+        <div class="stat-l">AI Accuracy</div>
+      </div>
+      <div class="stat">
+        <span class="stat-n">24<b>/7</b></span>
+        <div class="stat-l">Availability</div>
+      </div>
+      <div class="stat">
+        <span class="stat-n"><span id="sCon">0</span><b>K+</b></span>
+        <div class="stat-l">Consultations</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      Scroll to discover
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- THE CHALLENGE -->
+  <section class="section">
+    <div class="section-inner">
+      <span class="sec-tag">The Challenge</span>
+      <h2 class="sec-heading">Healthcare is broken<br>for most people</h2>
+      <p class="sec-sub">Many people skip medical care entirely due to cost, access, and complexity — even when it matters most.</p>
+      <div class="num-list">
+        <div class="num-item">
+          <div class="num-idx">01</div>
+          <div class="num-body">
+            <h3>Long wait times and unavailable doctors</h3>
+            <p>Booking an appointment can take days or weeks, leaving patients without timely guidance during critical moments.</p>
+          </div>
+        </div>
+        <div class="num-item">
+          <div class="num-idx">02</div>
+          <div class="num-body">
+            <h3>Unreliable self-diagnosis online</h3>
+            <p>Search engines provide generic results that are often inaccurate, causing unnecessary anxiety or dangerous delays.</p>
+          </div>
+        </div>
+        <div class="num-item">
+          <div class="num-idx">03</div>
+          <div class="num-body">
+            <h3>No continuous health monitoring</h3>
+            <p>Isolated appointments miss the bigger picture — symptoms evolve, and most systems don't track changes over time.</p>
+          </div>
+        </div>
+        <div class="num-item">
+          <div class="num-idx">04</div>
+          <div class="num-body">
+            <h3>Healthcare is expensive and inaccessible</h3>
+            <p>For millions, the cost of quality healthcare puts it completely out of reach — leading to avoidable health crises.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PLATFORM FEATURES -->
+  <section class="section" id="features">
+    <div class="section-inner">
+      <span class="sec-tag">The Solution</span>
+      <h2 class="sec-heading">Powerful, affordable<br>AI healthcare</h2>
+      <p class="sec-sub">MediCare puts a full suite of intelligent medical tools directly in your hands — no appointments, no waiting rooms.</p>
+      <div class="feat-list">
+
+        <!-- ROW 1: visual LEFT, text RIGHT -->
+        <div class="feat-row" onclick="nav('chatbot')">
+          <div class="feat-visual">
+            <div class="feat-num">01</div>
+            <div class="feat-big-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div class="feat-title">AI Health Chatbot</div>
+            <span class="badge teal">Instant</span>
+          </div>
+          <div class="feat-text">
+            <p class="feat-desc">Chat with our AI assistant for symptom analysis, wellness guidance, and personalised medication information — available 24 hours a day, 7 days a week.</p>
+            <button class="feat-btn" onclick="event.stopPropagation();nav('chatbot')">Start consultation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </div>
+        </div>
+
+        <!-- ROW 2: text LEFT, visual RIGHT -->
+        <div class="feat-row reverse" onclick="nav('cough')">
+          <div class="feat-visual">
+            <div class="feat-num">02</div>
+            <div class="feat-big-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <div class="feat-title">Cough Analysis</div>
+            <span class="badge teal">AI Diagnosis</span>
+          </div>
+          <div class="feat-text">
+            <p class="feat-desc">Record or upload your cough directly in the browser. Our AI analyses the acoustic pattern and frequency signature to identify respiratory conditions — instantly, with no hardware needed.</p>
+            <button class="feat-btn" onclick="event.stopPropagation();nav('cough')">Analyse now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </div>
+        </div>
+
+        <!-- ROW 3: visual LEFT, text RIGHT -->
+        <div class="feat-row" onclick="nav('doctor')">
+          <div class="feat-visual">
+            <div class="feat-num">03</div>
+            <div class="feat-big-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="feat-title">Doctor Consultation</div>
+            <span class="badge green">Available</span>
+          </div>
+          <div class="feat-text">
+            <p class="feat-desc">AI-powered triage or connect directly with verified, licensed doctors near you for in-person visits, specialist referrals, and trusted second opinions.</p>
+            <button class="feat-btn" onclick="event.stopPropagation();nav('doctor')">Book now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </div>
+        </div>
+
+        <!-- ROW 4: text LEFT, visual RIGHT -->
+        <div class="feat-row reverse" onclick="nav('hospitals')">
+          <div class="feat-visual">
+            <div class="feat-num">04</div>
+            <div class="feat-big-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><path d="M12 7v6M9 10h6"/></svg>
+            </div>
+            <div class="feat-title">Nearby Hospitals</div>
+            <span class="badge amber">Location</span>
+          </div>
+          <div class="feat-text">
+            <p class="feat-desc">Locate hospitals, clinics, and emergency centres near your current position with live map integration, distance info, and one-tap directions.</p>
+            <button class="feat-btn" onclick="event.stopPropagation();nav('hospitals')">Find nearby <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-inner">
+      <span class="sec-tag">How It Works</span>
+      <h2 class="sec-heading">Three steps to better health</h2>
+      <p class="sec-sub">No forms, no waiting rooms, no confusion — just fast, intelligent care at your fingertips.</p>
+      <div class="hiw-grid">
+        <div class="hiw-step">
+          <div class="hiw-num">01</div>
+          <div class="hiw-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div class="hiw-title">Describe your symptoms</div>
+          <p class="hiw-desc">Type or speak your symptoms naturally — just like talking to a doctor. No medical jargon needed.</p>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">02</div>
+          <div class="hiw-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <div class="hiw-title">AI analyses instantly</div>
+          <p class="hiw-desc">Our AI engine cross-references your symptoms with thousands of medical cases in seconds — no waiting.</p>
+        </div>
+        <div class="hiw-step">
+          <div class="hiw-num">03</div>
+          <div class="hiw-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/></svg>
+          </div>
+          <div class="hiw-title">Get clear guidance</div>
+          <p class="hiw-desc">Receive personalised recommendations — treatment steps, medication info, or a direct link to a real doctor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2>Start your health journey today</h2>
+    <p>Say goodbye to waiting rooms and unreliable search results. MediCare is built for everyone — not just those who can afford it.</p>
+    <div class="fb-grid" id="fbGrid">
+      <div class="fb-card">
+        <div class="fb-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="fb-quote">"I described my chest tightness and within seconds MediCare flagged it seriously and connected me to a doctor. Genuinely could have saved my life."</p>
+        <div class="fb-author">
+          <div class="fb-av">R</div>
+          <div><div class="fb-name">Ravi Shankar</div><div class="fb-role">Software Engineer, Chennai</div></div>
+        </div>
+      </div>
+      <div class="fb-card">
+        <div class="fb-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="fb-quote">"The cough analysis tool identified early signs of bronchitis before I even visited a clinic. The accuracy was impressive and the UI so clean."</p>
+        <div class="fb-author">
+          <div class="fb-av">P</div>
+          <div><div class="fb-name">Priya Nair</div><div class="fb-role">Teacher, Kochi</div></div>
+        </div>
+      </div>
+      <div class="fb-card">
+        <div class="fb-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="fb-quote">"As someone in a rural area with no easy clinic access, MediCare has been a lifeline. Available 24/7 and actually understands what I'm going through."</p>
+        <div class="fb-author">
+          <div class="fb-av">A</div>
+          <div><div class="fb-name">Arun Mehta</div><div class="fb-role">Farmer, Rajasthan</div></div>
         </div>
       </div>
     </div>
 
-    <div class="sidebar-menu">
-      <div class="menu-section-title">Quick Access</div>
-      
-      <a href="health-dashboard.html" class="menu-item">
-        <span class="menu-item-icon">📊</span>
-        <span class="menu-item-text">Health Dashboard</span>
-      </a>
-
-      <a href="hospital.html" class="menu-item">
-        <span class="menu-item-icon">�</span>
-        <span class="menu-item-text">Nearby Hospitals</span>
-      </a>
-
-      <!-- Coming Soon - More Options -->
-      <!--
-      <a href="cough-prediction.html" class="menu-item">
-        <span class="menu-item-icon">🎤</span>
-        <span class="menu-item-text">Cough Analysis</span>
-      </a>
-
-      <a href="ai-chat.html" class="menu-item">
-        <span class="menu-item-icon">�</span>
-        <span class="menu-item-text">AI Doctor Chat</span>
-      </a>
-
-      <a href="doctor-options.html" class="menu-item">
-        <span class="menu-item-icon">👨‍⚕️</span>
-        <span class="menu-item-text">Find Doctors</span>
-      </a>
-      -->
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="menu-item" onclick="handleAuth()" style="color: #ef4444;">
-        <span class="menu-item-icon">🚪</span>
-        <span class="menu-item-text">Logout</span>
+    <!-- LEAVE YOUR FEEDBACK -->
+    <div class="fb-form-wrap">
+      <h3>Share your experience</h3>
+      <p>Used MediCare? Let others know how it helped you.</p>
+      <div class="fb-star-pick" id="starPick">
+        <svg viewBox="0 0 24 24" data-v="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg viewBox="0 0 24 24" data-v="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg viewBox="0 0 24 24" data-v="3"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg viewBox="0 0 24 24" data-v="4"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg viewBox="0 0 24 24" data-v="5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
-    </div>
-  </div>
-
-  <!-- Floating shapes decoration -->
-  <div class="floating-shapes">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-  </div>
-
-  <!-- Wave animation -->
-  <div class="waves">
-    <div class="wave"></div>
-    <div class="wave"></div>
-    <div class="wave"></div>
-  </div>
-
-  <div class="container">
-    <header class="header">
-      <!-- User greeting (shown when logged in) -->
-      <div class="user-greeting" id="userGreeting" style="display: none;">
-        <div class="user-avatar" id="userAvatar">U</div>
-        <span class="user-name" id="userName">User</span>
+      <div class="fb-row">
+        <input class="fb-input" id="fbName" type="text" placeholder="Your name" maxlength="60" autocomplete="off">
+        <input class="fb-input" id="fbRole" type="text" placeholder="Occupation / City" maxlength="60" autocomplete="off">
       </div>
-
-      <!-- Login/Logout button -->
-      <button class="auth-button" id="authButton" onclick="handleAuth()">
-        🔐 Login
+      <textarea class="fb-textarea" id="fbMsg" placeholder="Tell us what you think about MediCare..." maxlength="320"></textarea>
+      <button class="fb-submit" id="fbSubmit">
+        Submit feedback
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
-
-      <div class="logo-section">
-        <div class="main-logo">🏥</div>
-      </div>
-      <h1>MediCare Health Platform</h1>
-      <p class="subtitle">Your Intelligent Healthcare Companion</p>
-    </header>
-
-    <!-- Stats Section -->
-    <section class="stats-section">
-      <div class="stat-card">
-        <span class="stat-number" data-target="95">0</span>
-        <span class="stat-label">Accuracy %</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number" data-target="24">0</span>
-        <span class="stat-label">Available 24/7</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number" data-target="100">0</span>
-        <span class="stat-label">Trusted</span>
-      </div>
-    </section>
-
-    <main class="options-grid">
-      <!-- Option 1: AI Health Chatbot -->
-      <div class="option-card" onclick="navigateTo('chatbot')">
-        <div class="option-icon">💬</div>
-        <h2 class="option-title">AI Health Chatbot</h2>
-        <p class="option-description">
-          Chat with our intelligent AI assistant for instant health guidance, symptom analysis, and wellness tips.
-        </p>
-        <span class="option-badge">Instant Response</span>
-      </div>
-
-      <!-- Option 2: Cough Disease Prediction -->
-      <div class="option-card" onclick="navigateTo('cough')">
-        <div class="option-icon">🫁</div>
-        <h2 class="option-title">Cough Disease Prediction</h2>
-        <p class="option-description">
-          Advanced AI-powered cough analysis to identify potential respiratory conditions and provide recommendations.
-        </p>
-        <span class="option-badge">AI Diagnosis</span>
-      </div>
-
-      <!-- Option 3: Doctor Consultation -->
-      <div class="option-card" onclick="navigateTo('doctor')">
-        <div class="option-icon">🩺</div>
-        <h2 class="option-title">Doctor Consultation</h2>
-        <p class="option-description">
-          Choose between AI-powered online consultation or find nearby offline doctors for in-person visits.
-        </p>
-        <span class="option-badge">New Feature</span>
-      </div>
-
-      <!-- Option 4: Nearby Hospitals -->
-      <div class="option-card" onclick="navigateTo('hospitals')">
-        <div class="option-icon">🏥</div>
-        <h2 class="option-title">Nearby Hospitals</h2>
-        <p class="option-description">
-          Find hospitals and emergency centres close to you — turn on location to see nearby results on the map.
-        </p>
-        <span class="option-badge">Location</span>
-      </div>
-    </main>
-
-    <footer class="footer">
-      <p>⚕️ MediCare Health Platform • Not a substitute for professional medical advice</p>
-      <p style="margin-top: 10px; font-size: 0.85rem;">© 2025 MediCare. All rights reserved.</p>
-    </footer>
-  </div>
-
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <span>Loading...</span>
-  </div>
-
-  <!-- Nearby hospitals modal -->
-  <div id="hospModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-      <h3>Nearby Hospitals</h3>
-      <p id="hospLocationText">Finding your location...</p>
-      <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
-        <button id="openMapsBtn" class="btn-primary">Open in Google Maps</button>
-        <button id="searchHospBtn" class="btn-secondary">Search Hospitals</button>
-        <button id="closeHospBtn" class="btn-ghost">Close</button>
+      <div class="fb-success" id="fbSuccess">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        Thank you! Your review is now live.
       </div>
     </div>
+
   </div>
 
-  <script>
-    // Animated Stats Counter
-    function animateStats() {
-      const statNumbers = document.querySelectorAll('.stat-number');
-      
-      statNumbers.forEach(stat => {
-        const target = parseInt(stat.getAttribute('data-target'));
-        const duration = 2000; // 2 seconds
-        const increment = target / (duration / 16); // 60fps
-        let current = 0;
-        
-        const updateCounter = () => {
-          current += increment;
-          if (current < target) {
-            stat.textContent = Math.floor(current);
-            requestAnimationFrame(updateCounter);
-          } else {
-            stat.textContent = target;
-          }
-        };
-        
-        updateCounter();
+</main>
+
+<footer>
+  <a href="#" class="foot-logo">
+    <div class="nav-mark" style="width:28px;height:28px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+    </div>
+    <span>Medi<b>Care</b></span>
+  </a>
+  <p class="foot-disc">MediCare is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.</p>
+  <p class="foot-copy">© 2025 MediCare. All rights reserved.</p>
+</footer>
+
+<div id="hospModal">
+  <div class="modal-box">
+    <h3>Nearby Hospitals</h3>
+    <p id="hospLocationText">Finding your location...</p>
+    <div class="modal-btns">
+      <button id="openMapsBtn" class="modal-btn p">Open in Maps</button>
+      <button id="searchHospBtn" class="modal-btn g">Search</button>
+      <button id="closeHospBtn" class="modal-btn g">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function count(el,to){var n=0,s=Math.ceil(to/60),t=setInterval(function(){n=Math.min(n+s,to);el.textContent=n;if(n>=to)clearInterval(t)},24)}
+window.addEventListener('load',function(){count(document.getElementById('sAcc'),95);count(document.getElementById('sCon'),50);checkAuth();loadSavedReviews();});
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');document.getElementById('navToggle').classList.toggle('open')}
+function nav(opt){
+  var m={chatbot:'ai-chat.html',cough:'indexcough.html',doctor:'doctor-options.html',hospitals:'hospital.html'};
+  if(m[opt]){window.location.href=m[opt]}
+}
+function checkAuth(){
+  var t=localStorage.getItem('authToken'),
+      info=JSON.parse(localStorage.getItem('userInfo')||'{}'),
+      name=info.name||localStorage.getItem('userName')||'',
+      btn=document.getElementById('authBtn'),
+      chip=document.getElementById('navChip'),
+      nm=document.getElementById('navName'),
+      av=document.getElementById('navAv');
+  if(t&&name){btn.textContent='Sign Out';btn.className='btn-nav outline';chip.classList.add('show');nm.textContent=name;av.textContent=name.charAt(0).toUpperCase()}
+  else{btn.textContent='Sign In';btn.className='btn-nav primary';chip.classList.remove('show')}
+}
+function handleAuth(){
+  if(localStorage.getItem('authToken')){if(confirm('Sign out of MediCare?')){localStorage.removeItem('authToken');localStorage.removeItem('userInfo');localStorage.removeItem('userName');checkAuth()}}
+  else{window.location.href='login.html'}
+}
+document.getElementById('closeHospBtn').addEventListener('click',function(){document.getElementById('hospModal').classList.remove('show')});
+document.getElementById('openMapsBtn').addEventListener('click',function(){window.open('https://www.google.com/maps/search/hospitals+near+me','_blank')});
+document.getElementById('searchHospBtn').addEventListener('click',function(){window.open('https://www.google.com/maps/search/hospitals+near+me','_blank')});
+
+// FEEDBACK FORM
+(function(){
+  var starVal=0;
+  var stars=document.querySelectorAll('#starPick svg');
+  function setStars(v){
+    starVal=v;
+    stars.forEach(function(s){
+      var sv=parseInt(s.getAttribute('data-v'));
+      s.classList.toggle('on',sv<=v);
+    });
+  }
+  stars.forEach(function(s){
+    s.addEventListener('click',function(){setStars(parseInt(s.getAttribute('data-v')));});
+    s.addEventListener('mouseenter',function(){
+      var hv=parseInt(s.getAttribute('data-v'));
+      stars.forEach(function(x){x.classList.toggle('on',parseInt(x.getAttribute('data-v'))<=hv);});
+    });
+  });
+  document.getElementById('starPick').addEventListener('mouseleave',function(){setStars(starVal);});
+
+  function starSVGs(n){
+    var s='';
+    for(var i=1;i<=5;i++){
+      var c=i<=n?'fill:#fbbf24;color:#fbbf24':'fill:rgba(255,255,255,.1);color:rgba(255,255,255,.15)';
+      s+='<svg viewBox="0 0 24 24" style="width:14px;height:14px;'+c+'"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    }
+    return s;
+  }
+
+  function renderCard(r,prepend){
+    var grid=document.getElementById('fbGrid');
+    if(!grid)return;
+    var card=document.createElement('div');
+    card.className='fb-card'+(prepend?' fb-new':'');
+    card.innerHTML=
+      '<div class="fb-stars">'+starSVGs(r.stars)+'</div>'+
+      '<p class="fb-quote">\u201c'+r.msg+'\u201d</p>'+
+      '<div class="fb-author">'+
+        '<div class="fb-av">'+r.name.trim().charAt(0).toUpperCase()+'</div>'+
+        '<div><div class="fb-name">'+r.name+'</div><div class="fb-role">'+r.role+'</div></div>'+
+      '</div>';
+    if(prepend&&grid.firstChild){grid.insertBefore(card,grid.firstChild);}
+    else{grid.appendChild(card);}
+  }
+
+  function loadSavedReviews(){
+    var saved=JSON.parse(localStorage.getItem('mcReviews')||'[]');
+    saved.forEach(function(r){renderCard(r,false);});
+  }
+  window.loadSavedReviews=loadSavedReviews;
+
+  document.getElementById('fbSubmit').addEventListener('click',function(){
+    var name=document.getElementById('fbName').value.trim();
+    var role=document.getElementById('fbRole').value.trim();
+    var msg=document.getElementById('fbMsg').value.trim();
+    if(!name){document.getElementById('fbName').focus();return;}
+    if(!msg){document.getElementById('fbMsg').focus();return;}
+    if(!starVal){alert('Please select a star rating.');return;}
+    var review={stars:starVal,name:name,role:role||'MediCare User',msg:msg,ts:Date.now()};
+    var saved=JSON.parse(localStorage.getItem('mcReviews')||'[]');
+    saved.unshift(review);
+    localStorage.setItem('mcReviews',JSON.stringify(saved));
+    renderCard(review,true);
+    // reset
+    setStars(0);
+    document.getElementById('fbName').value='';
+    document.getElementById('fbRole').value='';
+    document.getElementById('fbMsg').value='';
+    var ok=document.getElementById('fbSuccess');
+    ok.classList.add('show');
+    setTimeout(function(){ok.classList.remove('show');},3500);
+  });
+})();
+
+// PLASMA BACKGROUND
+(function initPlasma(){
+  var canvas=document.getElementById('plasmaCanvas');
+  if(!canvas)return;
+  var gl=canvas.getContext('webgl2',{alpha:true,antialias:false,powerPreference:'high-performance'});
+  if(!gl){canvas.style.display='none';return;}
+  var V='#version 300 es\nprecision highp float;\nin vec2 position;\nvoid main(){gl_Position=vec4(position,0.0,1.0);}';
+  var F=[
+    '#version 300 es',
+    'precision highp float;',
+    'uniform vec2 iResolution;',
+    'uniform float iTime;',
+    'uniform vec3 uCustomColor;',
+    'uniform float uUseCustomColor;',
+    'uniform float uSpeed;',
+    'uniform float uDirection;',
+    'uniform float uScale;',
+    'uniform float uOpacity;',
+    'uniform vec2 uMouse;',
+    'uniform float uMouseInteractive;',
+    'out vec4 fragColor;',
+    'void mainImage(out vec4 o,vec2 C){',
+    '  vec2 center=iResolution.xy*0.5;',
+    '  C=(C-center)/uScale+center;',
+    '  vec2 mo=(uMouse-center)*0.0002;',
+    '  C+=mo*length(C-center)*step(0.5,uMouseInteractive);',
+    '  float i,d,z,T=iTime*uSpeed*uDirection;',
+    '  vec3 O,p,S;',
+    '  for(vec2 r=iResolution.xy,Q;++i<60.;O+=o.w/d*o.xyz){',
+    '    p=z*normalize(vec3(C-.5*r,r.y));p.z-=4.;S=p;d=p.y-T;',
+    '    p.x+=.4*(1.+p.y)*sin(d+p.x*0.1)*cos(.34*d+p.x*0.05);',
+    '    Q=p.xz*=mat2(cos(p.y+vec4(0,11,33,0)-T));',
+    '    z+=d=abs(sqrt(length(Q*Q))-.25*(5.+S.y))/3.+8e-4;',
+    '    o=1.+sin(S.y+p.z*.5+S.z-length(S-p)+vec4(2,1,0,8));',
+    '  }',
+    '  o.xyz=tanh(O/1e4);',
+    '}',
+    'bool fn1(float x){return!(isnan(x)||isinf(x));}',
+    'void main(){',
+    '  vec4 o=vec4(0.0);',
+    '  mainImage(o,gl_FragCoord.xy);',
+    '  vec3 c=vec3(fn1(o.r)?o.r:0.,fn1(o.g)?o.g:0.,fn1(o.b)?o.b:0.);',
+    '  float bright=(c.r+c.g+c.b)/3.;',
+    '  vec3 fc=mix(c,bright*uCustomColor,step(0.5,uUseCustomColor));',
+    '  fragColor=vec4(fc,length(c)*uOpacity);',
+    '}'
+  ].join('\n');
+  function mkS(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.warn('Plasma shader:',gl.getShaderInfoLog(s));return null;}return s;}
+  var vs=mkS(gl.VERTEX_SHADER,V),fs=mkS(gl.FRAGMENT_SHADER,F);
+  if(!vs||!fs){canvas.style.display='none';return;}
+  var prog=gl.createProgram();
+  gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){console.warn('Plasma link:',gl.getProgramInfoLog(prog));canvas.style.display='none';return;}
+  gl.useProgram(prog);
+  var buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  var posAttr=gl.getAttribLocation(prog,'position');
+  gl.enableVertexAttribArray(posAttr);
+  gl.vertexAttribPointer(posAttr,2,gl.FLOAT,false,0,0);
+  function uni(n){return gl.getUniformLocation(prog,n);}
+  var uTime=uni('iTime'),uRes=uni('iResolution'),uMouse=uni('uMouse');
+  gl.uniform3fv(uni('uCustomColor'),new Float32Array([34/255,211/255,238/255]));
+  gl.uniform1f(uni('uUseCustomColor'),1);
+  gl.uniform1f(uni('uSpeed'),.4);
+  gl.uniform1f(uni('uDirection'),1);
+  gl.uniform1f(uni('uScale'),1);
+  gl.uniform1f(uni('uOpacity'),1);
+  gl.uniform2f(uMouse,0,0);
+  gl.uniform1f(uni('uMouseInteractive'),1);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  var hero=canvas.parentElement;
+  function resize(){
+    var r=hero.getBoundingClientRect(),sc=Math.min(.5,720/Math.max(1,r.width));
+    var w=Math.max(1,Math.floor(r.width*sc)),h=Math.max(1,Math.floor(r.height*sc));
+    canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);gl.uniform2f(uRes,w,h);
+  }
+  var ro=new ResizeObserver(resize);ro.observe(hero);resize();
+  hero.addEventListener('mousemove',function(e){
+    var r=hero.getBoundingClientRect(),sc=canvas.width/r.width;
+    gl.uniform2f(uMouse,(e.clientX-r.left)*sc,(r.height-(e.clientY-r.top))*sc);
+  });
+  function setTouch(e){
+    if(!e.touches.length)return;
+    var t=e.touches[0],r=hero.getBoundingClientRect(),sc=canvas.width/r.width;
+    gl.uniform2f(uMouse,(t.clientX-r.left)*sc,(r.height-(t.clientY-r.top))*sc);
+  }
+  hero.addEventListener('touchstart',setTouch,{passive:true});
+  hero.addEventListener('touchmove',setTouch,{passive:true});
+  hero.addEventListener('touchend',function(){
+    gl.uniform2f(uMouse,canvas.width/2,canvas.height/2);
+  },{passive:true});
+  var t0=performance.now();
+  (function loop(t){
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime,(t-t0)*.001);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    requestAnimationFrame(loop);
+  }(performance.now()));
+})();
+
+// TRUE FOCUS
+(function(){
+  const words=document.querySelectorAll('#trueFocus .focus-word');
+  const frame=document.getElementById('focusFrame');
+  const container=document.getElementById('trueFocus');
+  const blurAmount=5,animDuration=500,pauseDuration=1200;
+  let current=0,timer=null;
+  function moveTo(i){
+    words.forEach((w,idx)=>{w.style.filter=idx===i?'blur(0px)':`blur(${blurAmount}px)`;w.classList.toggle('active',idx===i)});
+    const pRect=container.getBoundingClientRect(),wRect=words[i].getBoundingClientRect();
+    frame.style.transform=`translate(${wRect.left-pRect.left}px,${wRect.top-pRect.top}px)`;
+    frame.style.width=wRect.width+'px';frame.style.height=wRect.height+'px';frame.style.opacity='1';
+  }
+  function start(){moveTo(current);timer=setInterval(()=>{current=(current+1)%words.length;moveTo(current)},animDuration+pauseDuration)}
+  requestAnimationFrame(()=>requestAnimationFrame(start));
+  words.forEach((w,i)=>{
+    w.addEventListener('mouseenter',()=>{clearInterval(timer);moveTo(i);current=i});
+    w.addEventListener('mouseleave',()=>{clearInterval(timer);timer=setInterval(()=>{current=(current+1)%words.length;moveTo(current)},animDuration+pauseDuration)});
+  });
+})();
+</script>
+<script src="bento-glow.js"></script>
+<script src="gooey-buttons.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TEXT ANIMATION EFFECTS
+     1. SplitText  — char-by-char fly-in on scroll (headings)
+     2. ScrollFloat — word-clip slide-up on scroll (body text)
+     3. TextPressure — mouse-proximity scale+glow on hero words
+═══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── 1. Inject animation CSS ────────────────────────────── */
+var sEl=document.createElement('style');
+sEl.textContent=
+/* char-by-char split animation */
+'.ch-a{display:inline-block;opacity:0;transform:translateY(30px);'+
+'font-variation-settings:"wght" 300;'+
+'transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),font-variation-settings .12s ease;'+
+'will-change:transform,opacity,font-variation-settings}'+
+'.ch-a.in{opacity:1;transform:translateY(0)}'+
+/* word scroll-float: overflow clip + slide from below */
+'.ww{display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.2em}'+
+'.wi{display:inline-block;opacity:0;transform:translateY(110%);'+
+'transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}'+
+'.wi.in{opacity:1;transform:translateY(0)}'+
+/* sec-tag pill reveal */
+'.sec-tag{opacity:0;transform:translateY(10px);'+
+'transition:opacity .5s ease,transform .5s cubic-bezier(.34,1.56,.64,1)}'+
+'.sec-tag.tag-in{opacity:1;transform:translateY(0)}'+
+/* TextPressure hero chars */
+'.tp{display:inline-block;'+
+'transition:transform .1s ease,text-shadow .1s ease;'+
+'will-change:transform,text-shadow;cursor:default}';
+document.head.appendChild(sEl);
+
+/* ── 2. Char split  (preserves <br> tags) ───────────────── */
+function splitChars(el,ms){
+  var segs=el.innerHTML.split(/(<br\s*\/?>)/gi);
+  var idx=0;
+  el.innerHTML=segs.map(function(seg){
+    if(/^<br/i.test(seg))return seg;
+    return Array.from(seg).map(function(ch){
+      if(ch===' ')return ' ';
+      var d=(idx++)*ms;
+      return '<span class="ch-a" style="transition-delay:'+d+'ms">'+ch+'</span>';
+    }).join('');
+  }).join('');
+}
+
+/* ── 3. Word split ──────────────────────────────────────── */
+function splitWords(el,ms){
+  var txt=el.textContent.trim();
+  el.innerHTML=txt.split(/\s+/).map(function(w,i){
+    return '<span class="ww"><span class="wi" style="transition-delay:'+(i*ms)+'ms">'+w+'</span></span>';
+  }).join(' ');
+}
+
+/* ── 4. IntersectionObserver — trigger .in class ─────────── */
+var io=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(!e.isIntersecting)return;
+    var el=e.target;
+    el.querySelectorAll('.ch-a,.wi').forEach(function(c){c.classList.add('in');});
+    el.classList.add('tag-in');     /* no-op on non-sec-tag elements */
+    io.unobserve(el);
+  });
+},{threshold:0.12});
+
+/* ── 5. Apply SplitText to headings ────────────────────── */
+document.querySelectorAll('.sec-heading').forEach(function(el){
+  splitChars(el,20); io.observe(el);
+});
+document.querySelectorAll('.cta-band h2').forEach(function(el){
+  splitChars(el,20); io.observe(el);
+});
+document.querySelectorAll('.feat-title,.hiw-title').forEach(function(el){
+  splitChars(el,26); io.observe(el);
+});
+
+/* ── 6. Apply ScrollFloat to body text ─────────────────── */
+document.querySelectorAll('.num-body h3').forEach(function(el){
+  splitWords(el,38); io.observe(el);
+});
+document.querySelectorAll('.sec-sub,.feat-desc,.cta-band p,.hiw-desc,.fb-quote').forEach(function(el){
+  splitWords(el,28); io.observe(el);
+});
+
+/* ── 7. Sec-tag pill reveal ─────────────────────────────── */
+document.querySelectorAll('.sec-tag').forEach(function(el){
+  io.observe(el);
+});
+
+/* ── 8. TextPressure on hero focus words ────────────────── */
+var fc=document.getElementById('trueFocus');
+if(fc){
+  /* Split each word into .tp char spans (TrueFocus still operates on .focus-word) */
+  fc.querySelectorAll('.focus-word').forEach(function(word){
+    var t=word.textContent;
+    word.textContent='';
+    Array.from(t).forEach(function(ch){
+      var s=document.createElement('span');
+      s.className='tp';
+      s.textContent=ch;
+      word.appendChild(s);
+    });
+  });
+
+  var RAF=null;
+  function applyPressure(px,py){
+    if(RAF)cancelAnimationFrame(RAF);
+    RAF=requestAnimationFrame(function(){
+      fc.querySelectorAll('.tp').forEach(function(ch){
+        var r=ch.getBoundingClientRect();
+        var dist=Math.hypot(px-(r.left+r.width*.5), py-(r.top+r.height*.5));
+        var str=Math.max(0,1-dist/190);
+        if(str>0.01){
+          ch.style.transform='scale('+(1+str*.42).toFixed(3)+')';
+          ch.style.textShadow='0 0 '+(str*20|0)+'px rgba(34,211,238,'+str.toFixed(2)+'),0 0 '+(str*40|0)+'px rgba(8,145,178,'+(str*.6).toFixed(2)+')';
+        } else {
+          ch.style.transform='';
+          ch.style.textShadow='';
+        }
       });
-    }
-
-    // Run stats animation when page loads
-    window.addEventListener('load', () => {
-      setTimeout(animateStats, 500);
     });
+  }
 
-    // Add parallax effect to floating shapes
-    document.addEventListener('mousemove', (e) => {
-      const shapes = document.querySelectorAll('.shape');
-      const mouseX = e.clientX / window.innerWidth;
-      const mouseY = e.clientY / window.innerHeight;
-      
-      shapes.forEach((shape, index) => {
-        const speed = (index + 1) * 20;
-        const x = (mouseX - 0.5) * speed;
-        const y = (mouseY - 0.5) * speed;
-        shape.style.transform = `translate(${x}px, ${y}px)`;
+  document.addEventListener('mousemove',function(e){applyPressure(e.clientX,e.clientY);});
+  document.addEventListener('touchstart',function(e){
+    if(e.touches.length)applyPressure(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(e.touches.length)applyPressure(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:true});
+  /* Reset on mouse leave from hero */
+  var heroEl=document.querySelector('.hero');
+  if(heroEl){
+    heroEl.addEventListener('mouseleave',function(){
+      fc.querySelectorAll('.tp').forEach(function(ch){
+        ch.style.transform=''; ch.style.textShadow='';
       });
     });
+  }
+}
 
-    // Toggle Sidebar Menu
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      const menuToggle = document.getElementById('menuToggle');
-      
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-      menuToggle.classList.toggle('active');
-    }
-
-    function navigateTo(option) {
-      // Navigate based on option — no loading overlay, instant navigation
-      switch(option) {
-          case 'chatbot':
-            window.location.href = 'ai-chat.html';
-            break;
-          case 'dashboard':
-            window.location.href = 'health-dashboard.html';
-            break;
-          case 'cough':
-            window.location.href = 'cough-prediction.html';
-            break;
-          case 'doctor':
-            window.location.href = 'doctor-options.html';
-            break;
-            case 'hospitals':
-              // open the full hospital finder page robustly (handle file:// and http(s) served cases)
-              (async () => {
-                // If served over HTTP(S) try the server path first
-                if (location.protocol === 'http:' || location.protocol === 'https:') {
-                  try {
-                    const resp = await fetch('/hospital-finder.html', { method: 'HEAD' });
-                    if (resp.ok) {
-                      window.location.href = '/hospital-finder.html';
-                      return;
-                    }
-                  } catch (e) {
-                    // ignore and try localhost fallback
-                  }
-                  // fallback to common dev server on localhost
-                  window.open('https://my-medicalapp.onrender.com/hospital-finder.html', '_blank');
-                  return;
-                }
-
-                // If opened via file:// attempt to map to the BACKEND/public file and open it
-                if (location.protocol === 'file:') {
-                  try {
-                    const href = location.href.replace(/\\\\/g, '/');
-                    const target = href.replace(/\/FRONTEND\//i, '/BACKEND/public/').replace(/[^/]*$/, 'hospital-finder.html');
-                    window.open(target, '_blank');
-                    return;
-                  } catch (err) {
-                    // last resort fallback
-                    window.open('https://my-medicalapp.onrender.com/hospital-finder.html', '_blank');
-                    return;
-                  }
-                }
-
-                // Default fallback
-                window.open('/hospital-finder.html', '_blank');
-              })();
-              return;
-          default:
-            break;
-        }
-    }
-
-    // Add particle animation
-    function createParticles() {
-      const particlesContainer = document.createElement('div');
-      particlesContainer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-      `;
-      document.body.appendChild(particlesContainer);
-
-      for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-          position: absolute;
-          width: ${Math.random() * 4 + 2}px;
-          height: ${Math.random() * 4 + 2}px;
-          background: rgba(65, 105, 225, 0.4);
-          border-radius: 50%;
-          left: ${Math.random() * 100}%;
-          top: ${Math.random() * 100}%;
-          animation: float ${Math.random() * 6 + 6}s ease-in-out infinite;
-          animation-delay: ${Math.random() * 6}s;
-        `;
-        particlesContainer.appendChild(particle);
-      }
-    }
-
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes float {
-        0%, 100% {
-          transform: translateY(0) rotate(0deg);
-          opacity: 0.7;
-        }
-        50% {
-          transform: translateY(-100px) rotate(180deg);
-          opacity: 1;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    document.addEventListener('DOMContentLoaded', createParticles);
-
-    // Authentication Management
-    function checkAuthStatus() {
-      const token = localStorage.getItem('authToken');
-      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      const authButton = document.getElementById('authButton');
-      const userGreeting = document.getElementById('userGreeting');
-      const userName = document.getElementById('userName');
-      const userAvatar = document.getElementById('userAvatar');
-
-      if (token && userInfo.name) {
-        // User is logged in
-        authButton.innerHTML = '🚪 Logout';
-        authButton.classList.add('logout');
-        
-        // Show user greeting
-        userGreeting.style.display = 'flex';
-        userName.textContent = userInfo.name;
-        userAvatar.textContent = userInfo.name.charAt(0).toUpperCase();
-      } else {
-        // User is not logged in
-        authButton.innerHTML = '🔐 Login';
-        authButton.classList.remove('logout');
-        userGreeting.style.display = 'none';
-      }
-    }
-
-    function handleAuth() {
-      const token = localStorage.getItem('authToken');
-      
-      if (token) {
-        // User is logged in - logout
-        if (confirm('Are you sure you want to logout?')) {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userInfo');
-          checkAuthStatus();
-          alert('You have been logged out successfully!');
-        }
-      } else {
-        // User is not logged in - go to login page
-        window.location.href = 'login.html';
-      }
-    }
-
-    // Check auth status on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      checkAuthStatus();
-      createParticles();
+/* ── 9. Variable Proximity — Roboto Flex wght axis on headings ─ */
+var vpEls=[];
+document.querySelectorAll('.sec-heading,.feat-title,.cta-band h2').forEach(function(el){vpEls.push(el);});
+var vpRAF=null;
+function applyVP(px,py){
+  if(vpRAF)cancelAnimationFrame(vpRAF);
+  vpRAF=requestAnimationFrame(function(){
+    vpEls.forEach(function(el){
+      el.querySelectorAll('.ch-a').forEach(function(ch){
+        var r=ch.getBoundingClientRect();
+        var dist=Math.hypot(px-(r.left+r.width*.5),py-(r.top+r.height*.5));
+        var t=Math.max(0,1-dist/200);
+        ch.style.fontVariationSettings="'wght' "+Math.round(300+t*600);
+      });
     });
+  });
+}
+document.addEventListener('mousemove',function(e){applyVP(e.clientX,e.clientY);});
+document.addEventListener('touchstart',function(e){
+  if(e.touches.length)applyVP(e.touches[0].clientX,e.touches[0].clientY);
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(e.touches.length)applyVP(e.touches[0].clientX,e.touches[0].clientY);
+},{passive:true});
 
-    // Modal and geolocation helpers
-    const hospModal = document.getElementById('hospModal');
-    const hospLocationText = document.getElementById('hospLocationText');
-    const openMapsBtn = document.getElementById('openMapsBtn');
-    const searchHospBtn = document.getElementById('searchHospBtn');
-    const closeHospBtn = document.getElementById('closeHospBtn');
-
-    function showModal() {
-      hospModal.style.display = 'flex';
-      hospModal.setAttribute('aria-hidden', 'false');
-    }
-    function hideModal() {
-      hospModal.style.display = 'none';
-      hospModal.setAttribute('aria-hidden', 'true');
-    }
-
-    closeHospBtn.addEventListener('click', hideModal);
-
-    function requestAndShowHospitals() {
-      hospLocationText.textContent = 'Requesting location permission...';
-      showModal();
-      if (!navigator.geolocation) {
-        hospLocationText.textContent = 'Geolocation is not supported by your browser.';
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lng = pos.coords.longitude.toFixed(6);
-        hospLocationText.textContent = `Your location: ${lat}, ${lng}`;
-
-        const mapsUrl = `https://www.google.com/maps/search/hospital+near+${lat},${lng}`;
-        openMapsBtn.onclick = () => window.open(mapsUrl, '_blank');
-        searchHospBtn.onclick = () => window.open(mapsUrl, '_blank');
-
-      }, (err) => {
-        hospLocationText.textContent = 'Unable to access location. Please allow location access in your browser or try again.';
-      }, { enableHighAccuracy: true, timeout: 8000 });
-    }
-
-    // Simple style improvements: make modal accessible initially hidden
-    hideModal();
-  </script>
+})();
+</script>
 </body>
 </html>

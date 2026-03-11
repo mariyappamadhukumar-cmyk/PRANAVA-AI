@@ -1,384 +1,291 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🩺 Doctor Consultation Options</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --primary: #4169E1;
-      --primary-dark: #1E90FF;
-      --secondary: #8B5CF6;
-      --accent: #10b981;
-      --bg-gradient-1: #FFE4E6;
-      --bg-gradient-2: #FFCCD5;
-      --card-bg: rgba(255, 255, 255, 0.25);
-      --border: rgba(65, 105, 225, 0.3);
-      --text-primary: #1f2937;
-      --text-secondary: #4b5563;
-    }
-
-    html, body {
-      height: 100%;
-      overflow-x: hidden;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 25% 25%, rgba(100, 149, 237, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(65, 105, 225, 0.12) 0%, transparent 50%);
-      z-index: -1;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Back Button */
-    .back-btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin: 20px 0 0 20px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border: 2px solid var(--border);
-      padding: 12px 24px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      z-index: 1;
-    }
-
-    .back-btn:hover {
-      transform: translateX(-5px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      background: white;
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 50px;
-      animation: fadeInDown 0.8s ease-out;
-    }
-
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 15px;
-    }
-
-    .subtitle {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* Options Grid */
-    .options-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 40px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .doctor-option {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 28px;
-      padding: 50px 40px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      position: relative;
-      overflow: hidden;
-      animation: fadeInUp 0.8s ease-out;
-      animation-fill-mode: both;
-    }
-
-    .doctor-option:nth-child(1) { animation-delay: 0.1s; }
-    .doctor-option:nth-child(2) { animation-delay: 0.2s; }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .doctor-option::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .doctor-option:hover::before {
-      opacity: 1;
-    }
-
-    .doctor-option:hover {
-      transform: translateY(-12px) scale(1.03);
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
-      border-color: var(--primary);
-    }
-
-    .doctor-icon {
-      font-size: 5rem;
-      margin-bottom: 25px;
-      display: inline-block;
-      transition: transform 0.3s ease;
-    }
-
-    .doctor-option:hover .doctor-icon {
-      transform: scale(1.15) rotate(-5deg);
-    }
-
-    .doctor-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 20px;
-    }
-
-    .doctor-description {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 25px;
-    }
-
-    .features-list {
-      list-style: none;
-      padding: 0;
-      margin: 25px 0;
-      text-align: left;
-    }
-
-    .features-list li {
-      padding: 10px 0;
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .features-list li::before {
-      content: '✓';
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(135deg, var(--accent), #059669);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .select-btn {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      padding: 16px 40px;
-      border-radius: 16px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(65, 105, 225, 0.3);
-      margin-top: 10px;
-    }
-
-    .select-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(65, 105, 225, 0.4);
-    }
-
-    .select-btn:active {
-      transform: translateY(-1px);
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .options-container {
-        grid-template-columns: 1fr;
-        gap: 30px;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      .doctor-option {
-        padding: 40px 30px;
-      }
-    }
-
-    /* Loading */
-    .loading {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none;
-      align-items: center;
-      gap: 10px;
-      background: white;
-      padding: 20px 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
-
-    .loading.active {
-      display: flex;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(65, 105, 225, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Consultation Options — MediCare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080808;--bg2:#111;--bg3:#1a1a1a;--border:rgba(255,255,255,.08);--border-hover:rgba(255,255,255,.18);--teal:#0891B2;--teal-lt:#22D3EE;--teal-dk:#0E7490;--text:#fff;--muted:rgba(255,255,255,.5);--dim:rgba(255,255,255,.28);--success:#10b981;--warn:#f59e0b;--danger:#ef4444}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:rgba(8,8,8,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto}
+.nav-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-mark svg{width:16px;height:16px;color:#fff;display:block}
+.nav-brand{font-size:.9rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+.nav-brand b{color:var(--teal-lt)}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;transition:color .15s,background .15s}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-chip{display:none;align-items:center;gap:8px;padding:5px 11px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;font-size:.8rem;font-weight:600;color:#fff}
+.nav-chip.show{display:flex}
+.nav-av{width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn-nav{padding:8px 20px;border-radius:7px;border:1px solid var(--border-hover);cursor:pointer;font-size:.8rem;font-weight:600;letter-spacing:.02em;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-nav.primary{background:#fff;color:#080808;border-color:#fff}
+.btn-nav.primary:hover{background:rgba(255,255,255,.88)}
+.btn-nav.outline{background:transparent;color:var(--danger);border-color:rgba(239,68,68,.3)}
+.btn-nav.outline:hover{background:rgba(239,68,68,.07)}
+.nav-toggle{width:34px;height:34px;border-radius:7px;background:transparent;border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:background .15s;flex-shrink:0}
+.nav-toggle:hover{background:rgba(255,255,255,.06)}
+.nav-toggle span{width:15px;height:1.5px;background:#fff;border-radius:1px;transition:all .2s}
+.nav-toggle.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:#111;border-right:1px solid var(--border);z-index:200;transition:left .22s ease;display:flex;flex-direction:column}
+.sidebar.open{left:0}
+.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:199;opacity:0;visibility:hidden;transition:all .22s}
+.sb-overlay.open{opacity:1;visibility:visible}
+.sb-head{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-mark svg{width:16px;height:16px;color:#fff;display:block}
+.sb-title{font-size:.88rem;font-weight:700;color:#fff}
+.sb-sub{font-size:.7rem;color:var(--muted);margin-top:1px}
+.sb-label{padding:16px 20px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:12px;padding:10px 20px;color:var(--muted);text-decoration:none;border-left:2px solid transparent;transition:all .15s;font-size:.85rem;font-weight:500;cursor:pointer}
+.sb-item:hover{background:rgba(255,255,255,.04);color:#fff;border-left-color:var(--teal)}
+.sb-item.red{color:rgba(239,68,68,.7)}
+.sb-item.red:hover{background:rgba(239,68,68,.06);border-left-color:var(--danger)}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;display:block}
+.sb-foot{margin-top:auto;border-top:1px solid var(--border);padding:8px 0}
+/* PAGE */
+.page{padding-top:64px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1}
+.inner{max-width:920px;margin:0 auto;padding:56px 24px 72px;width:100%;flex:1}
+.pg-ey{font-size:.71rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-lt);margin-bottom:10px}
+.pg-h1{font-size:clamp(1.9rem,3.5vw,2.6rem);font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:10px;line-height:1.1}
+.pg-sub{font-size:.95rem;color:var(--muted);margin-bottom:52px}
+/* CARDS */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:28px;align-items:start}
+.opt-card{
+  background:rgba(17,17,17,.72);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:22px;
+  cursor:pointer;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,border-color .22s;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+/* coloured glow stripe at top */
+.opt-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-lt));border-radius:22px 22px 0 0;opacity:.7}
+.opt-card.video::after{background:linear-gradient(90deg,#059669,#34d399)}
+.opt-card:hover{transform:translateY(-6px) scale(1.01);border-color:rgba(8,145,178,.4);box-shadow:0 24px 64px rgba(8,145,178,.18),0 0 0 1px rgba(8,145,178,.12)}
+.opt-card.video:hover{border-color:rgba(16,185,129,.4);box-shadow:0 24px 64px rgba(16,185,129,.18),0 0 0 1px rgba(16,185,129,.12)}
+/* card header band */
+.opt-hd{padding:28px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+.opt-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,rgba(8,145,178,.25),rgba(34,211,238,.08));color:var(--teal-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(8,145,178,.25);box-shadow:0 4px 20px rgba(8,145,178,.15)}
+.opt-icon svg{width:28px;height:28px;display:block}
+.opt-icon.green{background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(52,211,153,.08));color:#34d399;border-color:rgba(16,185,129,.25);box-shadow:0 4px 20px rgba(16,185,129,.15)}
+.opt-badge{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.04em;border:1px solid rgba(8,145,178,.25);background:rgba(8,145,178,.08);color:var(--teal-lt);white-space:nowrap}
+.opt-badge.green{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);color:#34d399}
+.opt-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--teal-lt);flex-shrink:0;animation:blink 2s infinite}
+.opt-badge-dot.green{background:#34d399}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* card body */
+.opt-body{padding:0 28px}
+.opt-title{font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:9px;letter-spacing:-.02em}
+.opt-desc{font-size:.875rem;color:var(--muted);line-height:1.68;margin-bottom:22px}
+/* divider */
+.opt-divider{height:1px;background:rgba(255,255,255,.06);margin:0 28px 20px}
+/* feats */
+.opt-feats{display:flex;flex-direction:column;gap:10px;padding:0 28px;margin-bottom:26px}
+.opt-feat{display:flex;align-items:center;gap:10px;font-size:.855rem;color:rgba(255,255,255,.72);line-height:1.35}
+.feat-check{width:20px;height:20px;border-radius:6px;background:rgba(8,145,178,.12);color:var(--teal-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(8,145,178,.22)}
+.feat-check svg{width:11px;height:11px;display:block}
+.feat-check.green{background:rgba(16,185,129,.12);color:#34d399;border-color:rgba(16,185,129,.22)}
+/* CTA */
+.opt-foot{padding:0 28px 28px;margin-top:auto}
+.opt-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px 20px;border-radius:14px;border:none;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:'Inter',sans-serif;letter-spacing:.01em;position:relative;overflow:hidden}
+.opt-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.09);opacity:0;transition:opacity .18s}
+.opt-btn:hover::before{opacity:1}
+.opt-btn.teal{background:linear-gradient(135deg,var(--teal),var(--teal-lt));color:#fff;box-shadow:0 8px 28px rgba(8,145,178,.38)}
+.opt-btn.teal:hover{box-shadow:0 12px 36px rgba(8,145,178,.55);transform:translateY(-1px)}
+.opt-btn.green{background:linear-gradient(135deg,#059669,#34d399);color:#fff;box-shadow:0 8px 28px rgba(16,185,129,.38)}
+.opt-btn.green:hover{box-shadow:0 12px 36px rgba(16,185,129,.55);transform:translateY(-1px)}
+.opt-btn svg{width:15px;height:15px;display:block;transition:transform .18s}
+.opt-btn:hover svg{transform:translateX(3px)}
+@media(max-width:768px){.nav-links{display:none}}
+@media(max-width:640px){.inner{padding:40px 16px 56px}.opts{grid-template-columns:1fr}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.inner{animation:fadeUp .4s ease-out}
+#rippleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+</style>
+<link rel="stylesheet" href="bento-glow.css">
+<link rel="stylesheet" href="gooey-buttons.css">
 </head>
 <body>
-  <button class="back-btn" onclick="goBack()">
-    ← Back to Home
-  </button>
+<canvas id="rippleCanvas"></canvas>
+<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head"><div class="sb-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg></div><div><div class="sb-title">MediCare</div><div class="sb-sub">Health Platform</div></div></div>
+  <div class="sb-label">Navigation</div>
+  <a href="ai-doctor.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>AI Doctor</a>
+  <a href="ai-chat.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>AI Chat</a>
+  <a href="indexcough.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>Cough Analysis</a>
+  <a href="online-consultation.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-4l-2 4h8l-2-4z"/></svg>Book Doctor</a>
+  <a href="hospital.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nearby Hospitals</a>
+  <a href="health-dashboard.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Health Dashboard</a>
+  <div class="sb-foot"><div class="sb-item red" onclick="handleAuth()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div></div>
+</aside>
+<nav class="nav">
+  <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  <a href="welcome.html" class="nav-logo"><div class="nav-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg></div><span class="nav-brand">Medi<b>Care</b></span></a>
+  <div class="nav-links"><a href="ai-doctor.html">AI Doctor</a><a href="indexcough.html">Cough Analysis</a><a href="online-consultation.html">Book Doctor</a><a href="hospital.html">Hospitals</a><a href="health-dashboard.html">Dashboard</a></div>
+  <div class="nav-chip" id="navChip"><div class="nav-av" id="navAv">U</div><span id="navName">User</span></div>
+  <button class="btn-nav primary" id="authBtn" onclick="handleAuth()">Sign In</button>
+</nav>
 
-  <div class="container">
-    <header class="header">
-      <h1>Choose Your Consultation Type</h1>
-      <p class="subtitle">Select the best option for your healthcare needs</p>
-    </header>
+<main class="page">
+  <div class="inner">
+    <p class="pg-ey">Consultation Options</p>
+    <h1 class="pg-h1">Choose your consultation type</h1>
+    <p class="pg-sub">Select the option that best fits your healthcare needs</p>
 
-    <main class="options-container">
-      <!-- AI Online Doctor -->
-      <div class="doctor-option" onclick="selectOption('ai-doctor')">
-        <div class="doctor-icon">🤖</div>
-        <h2 class="doctor-title">AI Online Doctor</h2>
-        <p class="doctor-description">
-          Get instant AI-powered medical consultation with personalized treatment recommendations.
-        </p>
-        <ul class="features-list">
-          <li>24/7 Availability</li>
-          <li>Instant Diagnosis</li>
-          <li>Personalized Treatment Plans</li>
-          <li>Medicine Recommendations</li>
-          <li>Symptom Analysis</li>
-          <li>Follow-up Questions</li>
-        </ul>
-        <button class="select-btn">Start AI Consultation →</button>
+    <div class="opts">
+
+      <div class="opt-card" onclick="window.location.href='ai-doctor.html'">
+        <div class="opt-hd">
+          <div class="opt-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="opt-badge"><span class="opt-badge-dot"></span>Always Online</div>
+        </div>
+        <div class="opt-body">
+          <div class="opt-title">AI Online Doctor</div>
+          <p class="opt-desc">Instant AI-powered medical consultation with personalised treatment recommendations and follow-up guidance.</p>
+        </div>
+        <div class="opt-divider"></div>
+        <div class="opt-feats">
+          <div class="opt-feat"><div class="feat-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>24/7 availability</div>
+          <div class="opt-feat"><div class="feat-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Instant diagnosis and symptom analysis</div>
+          <div class="opt-feat"><div class="feat-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Personalised treatment plans</div>
+          <div class="opt-feat"><div class="feat-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Medicine and vaccination recommendations</div>
+          <div class="opt-feat"><div class="feat-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Detailed follow-up guidance</div>
+        </div>
+        <div class="opt-foot">
+          <button class="opt-btn teal" onclick="event.stopPropagation();window.location.href='ai-doctor.html'">
+            Start AI Consultation
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Online Consultation -->
-      <div class="doctor-option" onclick="selectOption('online-consultation')">
-        <div class="doctor-icon">🎥</div>
-        <h2 class="doctor-title">Online Consultation</h2>
-        <p class="doctor-description">
-          Book a live video call with a verified doctor from home. No travel needed.
-        </p>
-        <ul class="features-list">
-          <li>Free Video Calls (Jitsi)</li>
-          <li>Real Licensed Doctors</li>
-          <li>Choose by Specialization</li>
-          <li>Tamil, Hindi, English &amp; more</li>
-          <li>E-Prescription Included</li>
-          <li>Practo / Apollo 247 links</li>
-        </ul>
-        <button class="select-btn">Book Video Consultation →</button>
+      <div class="opt-card video" onclick="window.location.href='online-consultation.html'">
+        <div class="opt-hd">
+          <div class="opt-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </div>
+          <div class="opt-badge green"><span class="opt-badge-dot green"></span>Live Doctors</div>
+        </div>
+        <div class="opt-body">
+          <div class="opt-title">Online Consultation</div>
+          <p class="opt-desc">Book a live video call with a verified, licensed doctor from the comfort of your home — no travel required.</p>
+        </div>
+        <div class="opt-divider"></div>
+        <div class="opt-feats">
+          <div class="opt-feat"><div class="feat-check green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Free video calls via Jitsi</div>
+          <div class="opt-feat"><div class="feat-check green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Real licensed doctors</div>
+          <div class="opt-feat"><div class="feat-check green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Choose by specialisation</div>
+          <div class="opt-feat"><div class="feat-check green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Tamil, Hindi, English and more</div>
+          <div class="opt-feat"><div class="feat-check green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>E-Prescription included</div>
+        </div>
+        <div class="opt-foot">
+          <button class="opt-btn green" onclick="event.stopPropagation();window.location.href='online-consultation.html'">
+            Book Video Consultation
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
       </div>
 
-    </main>
+    </div>
   </div>
-
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <span>Loading...</span>
-  </div>
-
-  <script>
-    function goBack() {
-      window.location.href = 'welcome.html';
-    }
-
-    function selectOption(option) {
-      switch(option) {
-        case 'ai-doctor':
-          window.location.href = 'ai-doctor.html';
-          break;
-        case 'online-consultation':
-          window.location.href = 'online-consultation.html';
-          break;
-      }
-    }
-  </script>
+</main>
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');document.getElementById('navToggle').classList.toggle('open')}
+function checkAuth(){var t=localStorage.getItem('authToken'),info=JSON.parse(localStorage.getItem('userInfo')||'{}'),name=info.name||localStorage.getItem('userName')||'',btn=document.getElementById('authBtn'),chip=document.getElementById('navChip'),nm=document.getElementById('navName'),av=document.getElementById('navAv');if(t&&name){btn.textContent='Sign Out';btn.className='btn-nav outline';chip.classList.add('show');nm.textContent=name;av.textContent=name.charAt(0).toUpperCase()}else{btn.textContent='Sign In';btn.className='btn-nav primary';chip.classList.remove('show')}}
+function handleAuth(){if(localStorage.getItem('authToken')){if(confirm('Sign out of MediCare?')){localStorage.removeItem('authToken');localStorage.removeItem('userInfo');localStorage.removeItem('userName');checkAuth()}}else{window.location.href='login.html'}}
+window.addEventListener('load',checkAuth);
+</script>
+<script src="bento-glow.js"></script>
+<script src="gooey-buttons.js"></script>
+<script>
+(function(){
+  var canvas=document.getElementById('rippleCanvas');
+  var gl=canvas&&(canvas.getContext('webgl')||canvas.getContext('experimental-webgl'));
+  if(!gl)return;
+  var vert='attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0.0,1.0);}';
+  var frag=[
+    'precision mediump float;',
+    'uniform float uTime;uniform vec2 uRes;uniform vec3 uGridColor;',
+    'uniform float uRippleIntensity;uniform float uGridSize;uniform float uGridThickness;',
+    'uniform float uVignetteStrength;uniform float uGlowIntensity;uniform float uOpacity;',
+    'uniform vec2 uMousePos;uniform float uMouseInfluence;uniform float uMouseRadius;',
+    'void main(){',
+    '  vec2 uv=gl_FragCoord.xy/uRes;',
+    '  float aspect=uRes.x/uRes.y;',
+    '  vec2 p=vec2((uv.x-0.5)*aspect,uv.y-0.5);',
+    '  vec2 mp=vec2((uMousePos.x-0.5)*aspect,uMousePos.y-0.5);',
+    '  float dist=length(p-mp);',
+    '  float rippleDecay=1.0-smoothstep(0.0,uMouseRadius,dist);',
+    '  vec2 delta=p-mp;',
+    '  vec2 dir=length(delta)>0.001?normalize(delta):vec2(0.0,0.0);',
+    '  float ripple=sin(dist*uGridSize*1.2-uTime*3.0)*uRippleIntensity*uMouseInfluence*rippleDecay;',
+    '  vec2 gridUV=uv*uGridSize+dir*ripple;',
+    '  vec2 f=fract(gridUV);',
+    '  vec2 d=min(f,1.0-f);',
+    '  float lw=1.0/uGridThickness;',
+    '  float line=max(smoothstep(lw,lw*0.4,d.x),smoothstep(lw,lw*0.4,d.y));',
+    '  float vig=1.0-smoothstep(0.3,1.0,length(uv-0.5)*1.4*uVignetteStrength*0.4);',
+    '  float glow=uGlowIntensity*uMouseInfluence*rippleDecay;',
+    '  float intensity=clamp((line+glow)*vig,0.0,1.0);',
+    '  vec3 col=uGridColor*intensity;',
+    '  gl_FragColor=vec4(col,uOpacity*intensity);',
+    '}'
+  ].join('');
+  function mkS(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+  var prog=gl.createProgram();
+  gl.attachShader(prog,mkS(gl.VERTEX_SHADER,vert));
+  gl.attachShader(prog,mkS(gl.FRAGMENT_SHADER,frag));
+  gl.linkProgram(prog);gl.useProgram(prog);
+  var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  var pos=gl.getAttribLocation(prog,'a_pos');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  var uTime=gl.getUniformLocation(prog,'uTime'),uRes=gl.getUniformLocation(prog,'uRes'),
+      uGridColor=gl.getUniformLocation(prog,'uGridColor'),uRippleIntensity=gl.getUniformLocation(prog,'uRippleIntensity'),
+      uGridSize=gl.getUniformLocation(prog,'uGridSize'),uGridThickness=gl.getUniformLocation(prog,'uGridThickness'),
+      uVignetteStrength=gl.getUniformLocation(prog,'uVignetteStrength'),uGlowIntensity=gl.getUniformLocation(prog,'uGlowIntensity'),
+      uOpacity=gl.getUniformLocation(prog,'uOpacity'),uMousePos=gl.getUniformLocation(prog,'uMousePos'),
+      uMouseInfluence=gl.getUniformLocation(prog,'uMouseInfluence'),uMouseRadius=gl.getUniformLocation(prog,'uMouseRadius');
+  gl.uniform3f(uGridColor,8/255,145/255,178/255);
+  gl.uniform1f(uRippleIntensity,0.06);gl.uniform1f(uGridSize,10.0);gl.uniform1f(uGridThickness,18.0);
+  gl.uniform1f(uVignetteStrength,2.0);gl.uniform1f(uGlowIntensity,0.14);gl.uniform1f(uOpacity,0.6);
+  gl.uniform2f(uMousePos,0.5,0.5);gl.uniform1f(uMouseInfluence,0.0);gl.uniform1f(uMouseRadius,0.55);
+  var mouseX=0.5,mouseY=0.5,influenceNow=0.0,influenceTarget=0.0;
+  function setMouse(x,y){mouseX=x/window.innerWidth;mouseY=1.0-y/window.innerHeight;influenceTarget=1.0;}
+  document.addEventListener('mousemove',function(e){setMouse(e.clientX,e.clientY);});
+  document.addEventListener('mouseleave',function(){influenceTarget=0.0;});
+  document.addEventListener('touchstart',function(e){setMouse(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+  document.addEventListener('touchmove',function(e){setMouse(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+  document.addEventListener('touchend',function(){influenceTarget=0.0;},{passive:true});
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;gl.viewport(0,0,canvas.width,canvas.height);}
+  resize();window.addEventListener('resize',resize);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  var t0=performance.now();
+  function render(){
+    requestAnimationFrame(render);
+    influenceNow+=(influenceTarget-influenceNow)*0.07;
+    var t=(performance.now()-t0)/1000.0;
+    gl.uniform1f(uTime,t);gl.uniform2f(uRes,canvas.width,canvas.height);
+    gl.uniform2f(uMousePos,mouseX,mouseY);gl.uniform1f(uMouseInfluence,influenceNow);
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  }
+  render();
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,72 @@
+/* ============================================================
+   Magic Bento Border-Glow Effect  —  shared across all pages
+   Mouse-tracked purple radial border glow + page spotlight
+   ============================================================ */
+
+/* Page-wide spotlight orb that follows the cursor / finger */
+.bento-spotlight {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(132,0,255,.05) 0%, transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  will-change: left, top;
+  opacity: 0;
+  transition: opacity .4s ease, left .08s linear, top .08s linear;
+}
+
+@media (max-width: 768px) {
+  .bento-spotlight {
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(8,145,178,.07) 0%, transparent 68%);
+    transition: opacity .4s ease, left .05s linear, top .05s linear;
+  }
+}
+
+/* Base glow-box class — applied by JS to every card */
+.glow-box {
+  position: relative !important;
+  overflow: hidden !important;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 220px;
+  transition: transform .3s ease, box-shadow .3s ease !important;
+}
+
+.glow-box:hover {
+  box-shadow:
+    0 4px 20px rgba(46,24,78,.45),
+    0 0 32px rgba(132,0,255,.22) !important;
+}
+
+/* The border glow pseudo-element */
+.glow-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 6px;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.85)) 0%,
+    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.40)) 30%,
+    transparent 60%
+  );
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 9;
+  transition: opacity .25s ease;
+}

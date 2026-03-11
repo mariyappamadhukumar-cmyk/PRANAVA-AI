@@ -1,823 +1,404 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Find My Location & Nearby Hospitals (30 km Radius)</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Nearby Hospitals — Pranava Health</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, Arial, sans-serif;
-      background: linear-gradient(135deg, #ff6b9d 0%, #ff9eb5 100%);
-      min-height: 100vh;
-      color: #333;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0B1E33;--teal:#0891B2;--teal-dk:#0E7490;--teal-lt:#22D3EE;
+      --tint:rgba(8,145,178,.1);--surface:#1a1a1a;--card:#111;--border:rgba(255,255,255,.08);
+      --text:#fff;--muted:rgba(255,255,255,.5);--dim:rgba(255,255,255,.28);
+      --green:#10b981;--danger:#ef4444;
+      --sh-sm:0 1px 6px rgba(0,0,0,.4);
+      --sh-md:0 4px 24px rgba(0,0,0,.5);
     }
-    .wrap { max-width: 1200px; margin: 20px auto; padding: 20px; }
-    h1 { color: white; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    button {
-      background: linear-gradient(135deg, #ff6b9d 0%, #ff9eb5 100%); color: #fff; border: none;
-      padding: 10px 16px; border-radius: 5px; cursor: pointer; font-weight: 600;
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--surface);color:var(--text);min-height:100vh}
+    /* NAV */
+    .nav{height:60px;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);box-shadow:var(--sh-sm);position:sticky;top:0;z-index:1000}
+    .nav-inner{max-width:1300px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;gap:16px}
+    .nav-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1rem;color:var(--navy);text-decoration:none;flex-shrink:0}
+    .nav-brand svg{color:var(--teal)}
+    .nav-title{font-size:.92rem;font-weight:600;color:var(--muted)}
+    .nav-links{display:flex;align-items:center;gap:4px;margin-right:auto}
+    .nav-links a{font-size:.83rem;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:8px;transition:background .15s,color .15s}
+    .nav-links a:hover{background:var(--tint);color:var(--teal-dk)}
+    @media(max-width:700px){.nav-links{display:none}}
+    .nav-back{display:flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;color:var(--teal);text-decoration:none;padding:7px 14px;border:1px solid rgba(8,145,178,.3);border-radius:10px;transition:all .15s}
+    .nav-back:hover{background:var(--tint)}
+    /* LAYOUT */
+    .layout{max-width:1300px;margin:0 auto;padding:20px 24px 40px;display:grid;grid-template-columns:380px 1fr;gap:20px;min-height:calc(100vh - 60px)}
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--sh-sm)}
+    .card-title{font-size:.93rem;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+    /* LOCATION BUTTONS */
+    .loc-btn{width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid var(--border);background:var(--card);color:var(--navy);font-family:'Inter',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:8px;transition:all .2s}
+    .loc-btn:hover{border-color:var(--teal);background:var(--tint)}
+    .loc-btn svg{color:var(--teal);flex-shrink:0}
+    .loc-btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .loc-btn.primary svg{color:#7fd8ea}
+    .loc-btn.primary:hover{background:var(--teal-dk)}
+    /* MANUAL */
+    .manual-section{display:none}
+    .form-label{font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:5px;display:block}
+    .form-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:.84rem;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:10px}
+    .form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,145,178,.08)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    /* INFO */
+    .info-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:2px}
+    .info-row{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;font-size:.79rem}
+    .info-row:last-child{margin-bottom:0}
+    .info-label{color:var(--muted);font-weight:600;min-width:70px;flex-shrink:0}
+    .info-value{color:var(--text);font-weight:500;line-height:1.45}
+    /* HOSPITAL LIST */
+    .hospital-list-wrap{margin-top:4px;max-height:420px;overflow-y:auto;padding-right:2px}
+    .hospital-list-wrap:empty::after{content:"No hospitals shown yet. Use a location button above.";color:var(--muted);font-size:.8rem;display:block;text-align:center;padding:24px 0}
+    .hospital-item{border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;background:var(--card)}
+    .hospital-item:hover,.hospital-item.active{border-color:var(--teal);background:var(--tint)}
+    .h-name{font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:3px}
+    .h-meta{font-size:.75rem;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+    .h-badge{padding:2px 8px;border-radius:20px;background:var(--surface);border:1px solid var(--border);font-size:.72rem;font-weight:600;color:var(--muted)}
+    .h-actions{display:flex;gap:6px;margin-top:8px}
+    .h-btn{flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-family:'Inter',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--navy)}
+    .h-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+    .h-btn.primary:hover{background:var(--teal-dk)}
+    .h-btn:not(.primary):hover{border-color:var(--teal);color:var(--teal)}
+    /* MAP */
+    .map-area{display:flex;flex-direction:column;gap:14px}
+    #map{height:580px;border-radius:16px;border:1px solid var(--border);overflow:hidden}
+    /* STATUS */
+    .status-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 16px;font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+    .status-bar.loading{border-color:rgba(8,145,178,.3);color:var(--teal)}
+    .status-bar.ok{border-color:rgba(5,150,105,.3);color:var(--green)}
+    .spinner{width:14px;height:14px;border:2px solid rgba(8,145,178,.2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    /* FULL PAGE LINK */
+    .fullpage-link{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--teal);font-weight:600;font-size:.83rem;text-decoration:none;transition:all .15s}
+    .fullpage-link:hover{border-color:var(--teal);background:var(--tint)}
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr;padding:14px;gap:14px}
+      #map{height:360px}
     }
-    button:hover { opacity: 0.9; transform: translateY(-1px); }
-    .info { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    #map { height: 500px; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-    .label { color: #ff6b9d; font-weight: 600; margin-top: 10px; }
-    .value { background: rgba(255,107,157,0.08); padding: 8px; border-radius: 4px; color: #333; }
-    .hospitals { margin-top: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .hospital { 
-      padding: 15px; 
-      border: 2px solid #ff6b9d; 
-      border-radius: 8px;
-      margin-bottom: 15px;
-      background: rgba(255,107,157,0.05);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    .hospital:hover {
-      background: rgba(255,107,157,0.1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255,107,157,0.3);
-    }
-    .hospital strong { color: #ff6b9d; font-size: 18px; }
-    .hospital button:hover {
-      opacity: 0.8;
-      transform: scale(1.05);
-    }
-    input[type="text"], input[type="number"] {
-      background: white;
-      color: #333;
-      border: 2px solid #e0e0e0;
-      padding: 10px;
-      border-radius: 4px;
-    }
+    /* ===== DARK OVERRIDES ===== */
+    body{background:#080808;padding-top:64px}
+    .layout{min-height:calc(100vh - 64px)}
+    .card-title,.h-name,.form-label,.loc-btn:not(.primary){color:#fff!important}
+    .h-btn:not(.primary){color:#fff!important;border-color:rgba(255,255,255,.12)!important}
+    .hospital-item:hover,.hospital-item.active{background:rgba(8,145,178,.06)!important}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:1001;height:64px;background:rgba(8,8,8,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto}
+    .nav-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .nav-mark svg{width:16px;height:16px;color:#fff;display:block}
+    .nav-brand{font-size:.9rem;font-weight:700;color:#fff!important;letter-spacing:-.01em}
+    .nav-brand b{color:var(--teal-lt)}
+    .nav-links{display:flex;align-items:center;gap:2px}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;transition:color .15s,background .15s}
+    .nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+    .nav-chip{display:none;align-items:center;gap:8px;padding:5px 11px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;font-size:.8rem;font-weight:600;color:#fff}
+    .nav-chip.show{display:flex}
+    .nav-av{width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .btn-nav{padding:8px 20px;border-radius:7px;border:1px solid rgba(255,255,255,.18);cursor:pointer;font-size:.8rem;font-weight:600;transition:all .15s;font-family:'Inter',sans-serif}
+    .btn-nav.primary{background:#fff;color:#080808;border-color:#fff}
+    .btn-nav.primary:hover{background:rgba(255,255,255,.88)}
+    .btn-nav.outline{background:transparent;color:var(--danger);border-color:rgba(239,68,68,.3)}
+    .nav-toggle{width:34px;height:34px;border-radius:7px;background:transparent;border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:background .15s;flex-shrink:0}
+    .nav-toggle:hover{background:rgba(255,255,255,.06)}
+    .nav-toggle span{width:15px;height:1.5px;background:#fff;border-radius:1px;transition:all .2s}
+    .nav-toggle.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+    .nav-toggle.open span:nth-child(2){opacity:0}
+    .nav-toggle.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+    .nav-sidebar{position:fixed;top:0;left:-280px;width:280px;height:100vh;background:#111;border-right:1px solid rgba(255,255,255,.08);z-index:1002;transition:left .22s ease;display:flex;flex-direction:column}
+    .nav-sidebar.open{left:0}
+    .sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1001;opacity:0;visibility:hidden;transition:all .22s}
+    .sb-overlay.open{opacity:1;visibility:visible}
+    .sb-head{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+    .sb-mark{width:32px;height:32px;border-radius:7px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sb-mark svg{width:16px;height:16px;color:#fff;display:block}
+    .sb-title{font-size:.88rem;font-weight:700;color:#fff}
+    .sb-sub{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:1px}
+    .sb-label{padding:16px 20px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+    .sb-item{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.5);text-decoration:none;border-left:2px solid transparent;transition:all .15s;font-size:.85rem;font-weight:500;cursor:pointer}
+    .sb-item:hover{background:rgba(255,255,255,.04);color:#fff;border-left-color:var(--teal)}
+    .sb-item.red{color:rgba(239,68,68,.7)}
+    .sb-item.red:hover{background:rgba(239,68,68,.06);border-left-color:#ef4444}
+    .sb-item svg{width:16px;height:16px;flex-shrink:0;display:block}
+    .sb-foot{margin-top:auto;border-top:1px solid rgba(255,255,255,.08);padding:8px 0}
+    @media(max-width:768px){.nav-links{display:none}}
   </style>
+<link rel="stylesheet" href="bento-glow.css">
+<link rel="stylesheet" href="gooey-buttons.css">
 </head>
 <body>
-  <div class="wrap">
-    <h1>🏥 Find Nearby Hospitals (30 km Radius)</h1>
-    
-    <div style="text-align:center; margin-bottom:20px;">
-      <button id="locBtn">📍 Use My Location</button>
-      <button id="demoBtn">🏢 Demo (Chennai)</button>
-      <button id="manualBtn">📝 Enter Address Manually</button>
-      <button id="openFinderBtn" style="margin-left:12px;background:#0ea5a4;color:#022c22;padding:10px 14px;border-radius:6px;border:none;cursor:pointer;font-weight:700;">🔎 Open Nearby Hospitals (full page)</button>
+<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
+<aside class="nav-sidebar" id="sidebar">
+  <div class="sb-head"><div class="sb-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg></div><div><div class="sb-title">MediCare</div><div class="sb-sub">Health Platform</div></div></div>
+  <div class="sb-label">Navigation</div>
+  <a href="ai-doctor.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>AI Doctor</a>
+  <a href="ai-chat.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>AI Chat</a>
+  <a href="indexcough.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>Cough Analysis</a>
+  <a href="online-consultation.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-4l-2 4h8l-2-4z"/></svg>Book Doctor</a>
+  <a href="hospital.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nearby Hospitals</a>
+  <a href="health-dashboard.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Health Dashboard</a>
+  <div class="sb-foot"><div class="sb-item red" onclick="handleAuth()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div></div>
+</aside>
+<nav class="nav">
+  <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  <a href="welcome.html" class="nav-logo"><div class="nav-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg></div><span class="nav-brand">Medi<b>Care</b></span></a>
+  <div class="nav-links"><a href="ai-doctor.html">AI Doctor</a><a href="indexcough.html">Cough Analysis</a><a href="online-consultation.html">Book Doctor</a><a href="hospital.html">Hospitals</a><a href="health-dashboard.html">Dashboard</a></div>
+  <div class="nav-chip" id="navChip"><div class="nav-av" id="navAv">U</div><span id="navName">User</span></div>
+  <button class="btn-nav primary" id="authBtn" onclick="handleAuth()">Sign In</button>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="card">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--teal)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        Find Hospitals
+      </div>
+      <button class="loc-btn primary" onclick="useMyLocation()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06z"/></svg>
+        Use My Location
+      </button>
+      <button class="loc-btn" onclick="demoChennai()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        Demo — Chennai
+      </button>
+      <button class="loc-btn" onclick="document.querySelector('.manual-section').style.display='block'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Enter Address Manually
+      </button>
+      <div class="manual-section" style="margin-top:8px">
+        <label class="form-label">Address</label>
+        <input class="form-input" id="manualAddress" placeholder="e.g. Anna Nagar, Chennai" />
+        <div class="form-row">
+          <div>
+            <label class="form-label">Latitude</label>
+            <input class="form-input" id="manualLat" placeholder="e.g. 13.0827" />
+          </div>
+          <div>
+            <label class="form-label">Longitude</label>
+            <input class="form-input" id="manualLon" placeholder="e.g. 80.2707" />
+          </div>
+        </div>
+        <button class="loc-btn primary" onclick="manualSearch()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Search
+        </button>
+      </div>
     </div>
 
-    <div id="manualInput" style="display: none; background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-      <h3 style="color: #ff6b9d; margin-top: 0;">🌍 Enter Location Manually</h3>
-      <div style="margin-bottom: 15px;">
-        <input type="text" id="addressInput" placeholder="Enter address (e.g., Chennai, Tamil Nadu)" 
-               style="width: 70%; margin-right: 10px;">
-        <button id="searchAddressBtn" style="padding: 10px 15px;">🔍 Search</button>
+    <!-- LOCATION INFO -->
+    <div class="card" id="locationInfoCard" style="display:none">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:var(--teal)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        Your Location
       </div>
-      <div style="margin-bottom: 15px;">
-        <strong style="color: #ff6b9d;">OR Enter Coordinates:</strong>
+      <div class="info-box">
+        <div class="info-row"><span class="info-label">Address</span><span class="info-value" id="coords">—</span></div>
+        <div class="info-row"><span class="info-label">Area</span><span class="info-value" id="address">—</span></div>
+        <div class="info-row"><span class="info-label">Pincode</span><span class="info-value" id="pincode">—</span></div>
       </div>
-      <div style="margin-bottom: 15px;">
-        <input type="number" id="latInput" placeholder="Latitude (e.g., 13.0827)" step="any"
-               style="width: 30%; margin-right: 10px;">
-        <input type="number" id="lonInput" placeholder="Longitude (e.g., 80.2707)" step="any"
-               style="width: 30%; margin-right: 10px;">
-        <button id="searchCoordsBtn" style="padding: 10px 15px;">📍 Go to Location</button>
-      </div>
-      <button id="closeManualBtn" style="background: #6c757d; padding: 8px 12px;">❌ Close</button>
     </div>
 
-    <div class="info">
-      <div class="label">📌 Coordinates</div>
-      <div class="value" id="coords">Click on map or use buttons above</div>
-      <div class="label">🏠 Full Address</div>
-      <div class="value" id="address">Address will appear here</div>
-      <div class="label">📮 Pincode</div>
-      <div class="value" id="pincode">Pincode will appear here</div>
-    </div>
-
-    <div id="map"></div>
-
-    <div class="hospitals" id="hospitals">
-      <h2>Nearby Hospitals</h2>
-      <div id="hospitalList">No data yet — find your location first.</div>
+    <!-- HOSPITAL LIST -->
+    <div class="card" style="flex:1;min-height:0">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:var(--teal)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c.55 0 1 .45 1 1v3h3c.55 0 1 .45 1 1s-.45 1-1 1h-3v3c0 .55-.45 1-1 1s-1-.45-1-1v-3H8c-.55 0-1-.45-1-1s.45-1 1-1h3V7c0-.55.45-1 1-1z"/></svg>
+        Hospitals Found
+      </div>
+      <div class="hospital-list-wrap" id="hospitalList"></div>
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const GOOGLE_API_KEY = "AIzySyCaGIDGuMgaCqFu_8S2acl7XqkpQAxWsgM";
-    const map = L.map('map').setView([20.5937, 78.9629], 5);
+  <!-- MAP + STATUS -->
+  <div class="map-area">
+    <div class="status-bar" id="statusBar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--teal)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      Select a location to discover hospitals within 30 km.
+    </div>
+    <div id="map"></div>
+    <a href="https://www.google.com/maps/search/hospitals+near+me" target="_blank" class="fullpage-link">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+      Open Nearby Hospitals on Google Maps
+    </a>
+  </div>
+</div>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const GOOGLE_API_KEY = "AIzaSyCaGIDGuMgaCqFu_8S2acl7XqkpQAxWsgM";
+  let map, userMarker;
+  const hospitalMarkers = [];
 
-    let marker = null;
-    let hospitalMarkers = [];
-    const coordsEl = document.getElementById("coords");
-    const addressEl = document.getElementById("address");
-    const pincodeEl = document.getElementById("pincode");
-    const hospitalList = document.getElementById("hospitalList");
+  map = L.map('map').setView([20.5937, 78.9629], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 18
+  }).addTo(map);
 
-    async function reverseGeocode(lat, lon) {
-      coordsEl.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-      addressEl.textContent = "Fetching address...";
-      pincodeEl.textContent = "Fetching...";
-      hospitalList.textContent = "Loading hospitals...";
+  function setStatus(msg, type) {
+    const el = document.getElementById('statusBar');
+    el.className = 'status-bar ' + (type||'');
+    el.innerHTML = type === 'loading'
+      ? '<div class="spinner"></div>' + msg
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--teal)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' + msg;
+  }
 
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);
-        const data = await res.json();
-        const address = data.display_name || "Unknown area";
-        const postcode = data.address?.postcode || "Not available";
-        addressEl.textContent = address;
-        pincodeEl.textContent = postcode;
-        getHospitals(lat, lon);
-      } catch (err) {
-        addressEl.textContent = "Error fetching address";
-        console.error(err);
-      }
+  function useMyLocation() {
+    if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+    setStatus('Acquiring your location…', 'loading');
+    navigator.geolocation.getCurrentPosition(
+      pos => getHospitals(pos.coords.latitude, pos.coords.longitude),
+      () => { setStatus('Location access denied. Try entering manually.'); }
+    );
+  }
+
+  function demoChennai() { getHospitals(13.0827, 80.2707); }
+
+  function manualSearch() {
+    const lat = parseFloat(document.getElementById('manualLat').value);
+    const lon = parseFloat(document.getElementById('manualLon').value);
+    const addr = document.getElementById('manualAddress').value.trim();
+    if (isNaN(lat) || isNaN(lon)) {
+      if (addr) geocodeAddress(addr); else alert('Enter coordinates or an address.');
+      return;
     }
+    getHospitals(lat, lon);
+  }
 
-    // Enhanced Google Places API functions to fetch Google Maps contact information
-    async function getGooglePlacesData(lat, lon, name) {
-      try {
-        console.log(`Fetching Google Maps data for: ${name}`);
-        
-        // Multiple search strategies to find the exact hospital
-        const searchQueries = [
-          `${name} hospital near ${lat},${lon}`,
-          `${name} hospital`,
-          `hospital ${name}`,
-          name.replace(/hospital/i, '').trim() + ' hospital'
-        ];
-        
-        for (let query of searchQueries) {
-          try {
-            // Search for place using Google Places Text Search
-            const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${lat},${lon}&radius=2000&key=${GOOGLE_API_KEY}`;
-            
-            const searchResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(searchUrl)}`);
-            
-            if (!searchResponse.ok) continue;
-            
-            const searchData = await searchResponse.json();
-            
-            if (searchData.results && searchData.results.length > 0) {
-              // Find the closest match
-              let bestMatch = searchData.results[0];
-              let minDistance = getDistance(lat, lon, bestMatch.geometry.location.lat, bestMatch.geometry.location.lng);
-              
-              for (let result of searchData.results) {
-                const distance = getDistance(lat, lon, result.geometry.location.lat, result.geometry.location.lng);
-                if (distance < minDistance) {
-                  minDistance = distance;
-                  bestMatch = result;
-                }
-              }
-              
-              // Get detailed information including contact numbers
-              const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${bestMatch.place_id}&fields=name,rating,formatted_phone_number,international_phone_number,website,opening_hours,reviews,photos,types,business_status,user_ratings_total,vicinity,formatted_address&key=${GOOGLE_API_KEY}`;
-              const detailsResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(detailsUrl)}`);
-              
-              if (detailsResponse.ok) {
-                const detailsData = await detailsResponse.json();
-                if (detailsData.result) {
-                  console.log(`Found Google Maps data for ${name}:`, detailsData.result);
-                  return detailsData.result;
-                }
-              }
-            }
-          } catch (searchError) {
-            console.warn(`Search failed for query: ${query}`, searchError);
-            continue;
-          }
-        }
-        
-        console.log(`No Google Maps data found for: ${name}`);
-        return null;
-        
-      } catch (error) {
-        console.error('Google Places API error:', error);
-        return null;
-      }
-    }
-    
-    // Function to extract and format Google Maps contact information
-    function formatGoogleMapsContact(googleData, osmPhone) {
-      const contacts = {
-        primary: 'Not available',
-        display: 'Contact information not available in Google Maps',
-        hasGoogleData: false
-      };
-      
-      if (googleData) {
-        const googlePhone = googleData.formatted_phone_number || googleData.international_phone_number;
-        
-        if (googlePhone) {
-          contacts.primary = googlePhone;
-          contacts.hasGoogleData = true;
-          
-          let displayParts = [];
-          displayParts.push(`📞 <strong>Phone (Google Maps):</strong> <a href="tel:${googlePhone}" style="color: #4CAF50; font-weight: bold; text-decoration: none;">${googlePhone}</a>`);
-          
-          if (googleData.international_phone_number && googleData.international_phone_number !== googleData.formatted_phone_number) {
-            displayParts.push(`🌍 <strong>International:</strong> ${googleData.international_phone_number}`);
-          }
-          
-          if (googleData.website) {
-            displayParts.push(`🌐 <strong>Website:</strong> <a href="${googleData.website}" target="_blank" style="color: #2196F3; text-decoration: underline;">${googleData.website}</a>`);
-          }
-          
-          if (googleData.business_status) {
-            const statusColor = googleData.business_status === 'OPERATIONAL' ? '#4CAF50' : '#ff6b6b';
-            displayParts.push(`🏢 <strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${googleData.business_status}</span>`);
-          }
-          
-          contacts.display = displayParts.join('<br>');
-        } else {
-          contacts.display = '📞 <strong>Google Maps:</strong> Contact number not available<br>🔍 Try calling directory assistance or search online';
-        }
-      }
-      
-      // Fallback to OSM data if no Google data
-      if (!contacts.hasGoogleData && osmPhone && osmPhone.primary !== 'Not available') {
-        contacts.primary = osmPhone.primary;
-        contacts.display = `📞 <strong>Phone:</strong> <a href="tel:${osmPhone.primary}" style="color: #4CAF50; font-weight: bold;">${osmPhone.primary}</a><br><small>Source: OpenStreetMap data</small>`;
-      }
-      
-      return contacts;
-    }
+  async function geocodeAddress(addr) {
+    setStatus('Geocoding address…', 'loading');
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=1`;
+    try {
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data = await res.json();
+      if (!data.length) { setStatus('Address not found.'); return; }
+      getHospitals(parseFloat(data[0].lat), parseFloat(data[0].lon));
+    } catch(e) { setStatus('Geocoding failed.'); }
+  }
 
-    async function getHospitals(lat, lon) {
-      hospitalList.innerHTML = "🔍 Searching nearby hospitals...";
-      
-      // Clear previous hospital markers
-      hospitalMarkers.forEach(marker => map.removeLayer(marker));
-      hospitalMarkers = [];
-      
-      const radiusKm = 30;
-      const overpassQuery = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="hospital"](around:${radiusKm * 1000},${lat},${lon});
-          way["amenity"="hospital"](around:${radiusKm * 1000},${lat},${lon});
-          relation["amenity"="hospital"](around:${radiusKm * 1000},${lat},${lon});
-        );
-        out center meta;
-      `;
+  async function reverseGeocode(lat, lon) {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, { headers:{'Accept-Language':'en'} });
+      const data = await res.json();
+      const adr  = data.address || {};
+      const display = [adr.road, adr.suburb || adr.neighbourhood].filter(Boolean).join(', ') || 'Unknown area';
+      const area    = [adr.city || adr.town || adr.village, adr.state].filter(Boolean).join(', ') || '';
+      const pin     = adr.postcode || '—';
+      document.getElementById('locationInfoCard').style.display = 'block';
+      document.getElementById('coords').textContent  = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+      document.getElementById('address').textContent = display + (area ? ', ' + area : '');
+      document.getElementById('pincode').textContent = pin;
+    } catch(e) { /* non-critical */ }
+  }
 
-      try {
-        const response = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          body: 'data=' + encodeURIComponent(overpassQuery),
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        });
+  async function getHospitals(lat, lon) {
+    setStatus('Searching for hospitals within 30 km…', 'loading');
+    reverseGeocode(lat, lon);
+    if (userMarker) map.removeLayer(userMarker);
+    hospitalMarkers.forEach(m => map.removeLayer(m));
+    hospitalMarkers.length = 0;
+    document.getElementById('hospitalList').innerHTML = '';
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    userMarker = L.circleMarker([lat, lon], { radius: 8, color: '#0B1E33', fillColor: '#0891B2', fillOpacity: 1, weight: 2 })
+      .addTo(map).bindPopup('<b>Your Location</b>').openPopup();
+    map.setView([lat, lon], 13);
 
-        const data = await response.json();
+    const query = `[out:json][timeout:30];(node["amenity"="hospital"](around:30000,${lat},${lon});way["amenity"="hospital"](around:30000,${lat},${lon}););out center 20;`;
+    try {
+      const res  = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data='+encodeURIComponent(query) });
+      const data = await res.json();
+      const elements = (data.elements || []).slice(0, 20);
+      if (!elements.length) { setStatus('No hospitals found in 30 km radius.'); return; }
 
-        if (!data.elements || data.elements.length === 0) {
-          hospitalList.innerHTML = "❌ No hospitals found within 30 km radius.";
-          return;
-        }
+      setStatus(`Found ${elements.length} hospitals`, 'ok');
+      const listEl = document.getElementById('hospitalList');
 
-        hospitalList.innerHTML = "";
-        
-        const hospitalsWithDistance = data.elements.map(hospital => {
-          const hospitalLat = hospital.lat || hospital.center?.lat;
-          const hospitalLon = hospital.lon || hospital.center?.lon;
-          
-          if (!hospitalLat || !hospitalLon) return null;
-          
-          const distance = getDistance(lat, lon, hospitalLat, hospitalLon);
-          return { ...hospital, distance, hospitalLat, hospitalLon };
-        }).filter(h => h !== null).sort((a, b) => a.distance - b.distance);
+      elements.forEach((el, i) => {
+        const elLat  = el.lat || el.center?.lat;
+        const elLon  = el.lon || el.center?.lon;
+        const name   = el.tags?.name || 'Hospital ' + (i+1);
+        const phone  = el.tags?.phone || el.tags?.['contact:phone'] || null;
+        const dist   = getDistance(lat, lon, elLat, elLon);
+        const type   = getHospitalType(el.tags);
+        const addr   = buildAddress(el.tags);
 
-        const hospitalsToShow = hospitalsWithDistance.slice(0, 20);
+        const marker = L.marker([elLat, elLon], {
+          icon: L.divIcon({ html: `<div style="background:var(--teal);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)">${i+1}</div>`, iconSize:[26,26], iconAnchor:[13,13] })
+        }).addTo(map);
+        marker.bindPopup(`<b>${name}</b><br><small>${addr || type}</small>${phone?'<br><small>'+phone+'</small>':''}`);
+        hospitalMarkers.push(marker);
 
-        // Process hospitals with Google Places enhancement
-        for (let index = 0; index < hospitalsToShow.length; index++) {
-          const hospital = hospitalsToShow[index];
-          const name = hospital.tags?.name || `Hospital ${index + 1}`;
-          const address = buildAddress(hospital.tags);
-          const phone = getContactInfo(hospital.tags);
-          const website = hospital.tags?.website || hospital.tags?.contact?.website || hospital.tags?.url || "";
-          const emergencyService = hospital.tags?.emergency || "Unknown";
-          const doctorInfo = getDoctorInfo(hospital.tags);
-          const hospitalType = getHospitalType(hospital.tags);
-          const operatingHours = getOperatingHours(hospital.tags);
-          const facilities = getFacilities(hospital.tags);
-          
-          // Get enhanced Google Places data
-          const googleData = await getGooglePlacesData(hospital.hospitalLat, hospital.hospitalLon, name);
-          
-          // Enhanced contact information with Google Maps data
-          const googleMapsContact = formatGoogleMapsContact(googleData, phone);
-          const enhancedPhone = googleMapsContact.primary;
-          const rating = googleData?.rating || null;
-          const totalRatings = googleData?.user_ratings_total || null;
-          const businessStatus = googleData?.business_status || "Unknown";
-          const enhancedWebsite = googleData?.website || website;
-          const enhancedHours = googleData?.opening_hours?.weekday_text?.join('<br>') || operatingHours;
-          const reviews = googleData?.reviews || [];
-          const hospitalTypes = googleData?.types || [];
-          
-          // Log contact information for debugging
-          console.log(`Contact info for ${name}:`, {
-            googlePhone: googleData?.formatted_phone_number,
-            internationalPhone: googleData?.international_phone_number,
-            osmPhone: phone.primary,
-            finalPhone: enhancedPhone
-          });
-          
-          const div = document.createElement("div");
-          div.className = "hospital";
-          div.setAttribute('data-lat', hospital.hospitalLat);
-          div.setAttribute('data-lon', hospital.hospitalLon);
-          div.setAttribute('data-name', name);
-          div.setAttribute('data-phone', phone.primary);
-          
-          div.onclick = function() {
-            showHospitalOnMap(hospital.hospitalLat, hospital.hospitalLon, name, address, phone.primary);
-          };
-          
-          div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="color: #ff6b9d; font-size: 18px;">${name}</strong>
-              <div style="text-align: right;">
-                <span style="color: #a6bcd6; font-size: 12px;">📏 ${hospital.distance.toFixed(1)} km away</span>
-                ${rating ? `<div style="color: #FFD700; font-size: 14px; margin-top: 2px;">⭐ ${rating}/5 ${totalRatings ? `(${totalRatings} reviews)` : ''}</div>` : ''}
-              </div>
-            </div>
-            
-            <div style="background: rgba(255,107,157,0.1); padding: 12px; border-radius: 5px; margin: 8px 0;">
-              <div style="margin-bottom: 8px;"><strong>🏥 Type:</strong> ${hospitalType}</div>
-              ${businessStatus !== 'Unknown' ? `<div style="margin-bottom: 8px;"><strong>🏢 Status:</strong> <span style="color: ${businessStatus === 'OPERATIONAL' ? '#4CAF50' : '#ff6b6b'}">${businessStatus}</span></div>` : ''}
-              <div style="margin-bottom: 8px;"><strong>📍 Address:</strong> ${address}</div>
-              ${googleData ? `<div style="margin-bottom: 8px; padding: 4px; background: rgba(76,175,80,0.1); border-radius: 3px;"><strong>✅ Google Maps:</strong> <span style="color: #4CAF50; font-size: 12px;">Verified hospital data available</span></div>` : `<div style="margin-bottom: 8px; padding: 4px; background: rgba(255,193,7,0.1); border-radius: 3px;"><strong>⚠️ Google Maps:</strong> <span style="color: #FF9800; font-size: 12px;">Limited data available</span></div>`}
-              
-              <!-- Google Maps Contact Information Section -->
-              <div style="background: rgba(76, 175, 80, 0.1); padding: 10px; border-radius: 4px; margin: 6px 0; border-left: 4px solid #4CAF50;">
-                <strong style="color: #4CAF50;">📞 Contact Information from Google Maps:</strong><br>
-                <div style="margin-top: 6px; font-size: 14px; line-height: 1.6;">
-                  ${googleMapsContact.display}
-                </div>
-                ${!googleMapsContact.hasGoogleData ? `<div style="margin-top: 8px; padding: 6px; background: rgba(255,193,7,0.2); border-radius: 3px; font-size: 12px;">⚠️ <strong>Note:</strong> This hospital may not have updated contact information in Google Maps. Please call directory assistance or search online for current phone numbers.</div>` : ''}
-              </div>
-              
-              <div style="margin-bottom: 8px;"><strong>🚑 Emergency:</strong> ${emergencyService === "yes" ? "✅ Available 24/7" : emergencyService === "no" ? "❌ Not available" : "❓ Unknown"}</div>
-              ${enhancedHours ? `<div style="margin-bottom: 8px;"><strong>⏰ Operating Hours:</strong><br><div style="font-size: 12px; margin-left: 10px; line-height: 1.3;">${enhancedHours}</div></div>` : ""}
-            </div>
-            
-            <!-- Enhanced Medical Staff & Doctor Information -->
-            <div style="background: rgba(0,255,0,0.1); padding: 10px; border-radius: 5px; margin: 8px 0;">
-              <strong>👨‍⚕️ Medical Information & Doctor Services:</strong>
-              ${doctorInfo.length > 0 ? doctorInfo.map(info => `<div style="margin: 3px 0; padding-left: 10px;">• ${info}</div>`).join('') : ''}
-              <div style="margin: 8px 0; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
-                <strong style="color: #4CAF50;">� For Doctor Appointments & Consultations:</strong><br>
-                <div style="font-size: 13px; margin-top: 4px;">
-                  • Call ${enhancedPhone !== 'Not available' ? enhancedPhone : 'hospital directly'} for doctor schedules<br>
-                  • Book appointments with specialists<br>
-                  • Emergency medical consultation available<br>
-                  ${rating ? `• Highly rated facility (${rating}⭐) with ${totalRatings} patient reviews` : ''}
-                </div>
-              </div>
-            </div>
-            
-            ${reviews.length > 0 ? `
-            <div style="background: rgba(0,100,255,0.1); padding: 10px; border-radius: 5px; margin: 8px 0; max-height: 150px; overflow-y: auto;">
-              <strong>� Recent Patient Reviews:</strong>
-              ${reviews.slice(0, 3).map(review => `
-                <div style="margin: 8px 0; padding: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; border-left: 3px solid #FFD700;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                    <strong style="font-size: 12px;">${review.author_name}</strong>
-                    <span style="color: #FFD700; font-size: 12px;">${'⭐'.repeat(review.rating)}</span>
-                  </div>
-                  <div style="font-size: 11px; line-height: 1.3;">${review.text.substring(0, 100)}${review.text.length > 100 ? '...' : ''}</div>
-                </div>
-              `).join('')}
-            </div>` : ''}
-            
-            ${facilities.length > 0 ? `
-            <div style="background: rgba(0,0,255,0.1); padding: 10px; border-radius: 5px; margin: 8px 0;">
-              <strong>🏥 Facilities & Services:</strong><br>
-              ${facilities.map(facility => `<span style="background: #ff6b9d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin: 2px; display: inline-block;">${facility}</span>`).join(' ')}
-            </div>` : ""}
-            
-            <div style="text-align: center; margin-top: 10px;">
-              <button onclick="event.stopPropagation(); callHospital('${enhancedPhone}')" style="background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin: 2px; cursor: pointer; font-weight: bold;">📞 Call Hospital</button>
-              <button onclick="event.stopPropagation(); getDirections(${hospital.hospitalLat}, ${hospital.hospitalLon})" style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin: 2px; cursor: pointer;">🗺️ Get Directions</button>
-              ${enhancedWebsite ? `<button onclick="event.stopPropagation(); window.open('${enhancedWebsite}', '_blank')" style="background: #6f42c1; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin: 2px; cursor: pointer;">🌐 Visit Website</button>` : ""}
-              ${rating ? `<button onclick="event.stopPropagation(); showHospitalDetails('${name}', '${rating}', '${totalRatings}', '${enhancedPhone}')" style="background: #ff9500; color: white; border: none; padding: 8px 12px; border-radius: 4px; margin: 2px; cursor: pointer;">⭐ View ${rating}★ Rating</button>` : ""}
-            </div>
-          `;
-          hospitalList.appendChild(div);
-        }
-
-        // Add hospital markers to map
-        hospitalsToShow.forEach(hospital => {
-          const hospitalMarker = L.circleMarker([hospital.hospitalLat, hospital.hospitalLon], {
-            radius: 6,
-            fillColor: "#ff6b9d",
-            color: "#fff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-          }).addTo(map);
-          
-          const name = hospital.tags?.name || "Hospital";
-          hospitalMarker.bindPopup(`<b>${name}</b><br>${hospital.distance.toFixed(1)} km away`);
-          hospitalMarkers.push(hospitalMarker);
-        });
-
-      } catch (err) {
-        console.error('Error fetching hospitals:', err);
-        hospitalList.innerHTML = `❌ Error loading hospitals: ${err.message}. Please try again.`;
-      }
-    }
-
-    function showHospitalOnMap(lat, lon, name, address, phone) {
-      map.setView([lat, lon], 16);
-      
-      const tempMarker = L.marker([lat, lon]).addTo(map);
-      tempMarker.bindPopup(`<b>${name}</b><br>${address}<br>📞 ${phone}`).openPopup();
-      
-      setTimeout(() => {
-        map.removeLayer(tempMarker);
-      }, 15000);
-    }
-
-    function getDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-    }
-
-    function getContactInfo(tags) {
-      const contacts = {
-        phones: [],
-        emergency: [],
-        fax: [],
-        emails: [],
-        other: []
-      };
-      
-      // Phone numbers
-      if (tags?.phone) contacts.phones.push(tags.phone);
-      if (tags?.['contact:phone']) contacts.phones.push(tags['contact:phone']);
-      if (tags?.['phone:mobile']) contacts.phones.push(`Mobile: ${tags['phone:mobile']}`);
-      
-      // Emergency numbers
-      if (tags?.['phone:emergency']) contacts.emergency.push(tags['phone:emergency']);
-      if (tags?.['contact:emergency']) contacts.emergency.push(tags['contact:emergency']);
-      if (tags?.emergency === 'yes' && tags?.phone) contacts.emergency.push(tags.phone);
-      
-      // Fax numbers
-      if (tags?.fax) contacts.fax.push(tags.fax);
-      if (tags?.['contact:fax']) contacts.fax.push(tags['contact:fax']);
-      
-      // Email addresses
-      if (tags?.email) contacts.emails.push(tags.email);
-      if (tags?.['contact:email']) contacts.emails.push(tags['contact:email']);
-      if (tags?.['contact:website']) contacts.emails.push(`Website: ${tags['contact:website']}`);
-      
-      // Build display string with formatted sections
-      const displayParts = [];
-      
-      if (contacts.phones.length > 0) {
-        displayParts.push(`📞 Phone: ${contacts.phones.join(', ')}`);
-      }
-      
-      if (contacts.emergency.length > 0) {
-        displayParts.push(`🚨 Emergency: ${contacts.emergency.join(', ')}`);
-      }
-      
-      if (contacts.fax.length > 0) {
-        displayParts.push(`📠 Fax: ${contacts.fax.join(', ')}`);
-      }
-      
-      if (contacts.emails.length > 0) {
-        displayParts.push(`📧 Email: ${contacts.emails.join(', ')}`);
-      }
-      
-      const primary = tags?.phone || tags?.['contact:phone'] || contacts.emergency[0] || "Not available";
-      const display = displayParts.length > 0 ? displayParts.join('<br>') : "📞 Contact hospital directly - phone number not available in database";
-      
-      return { primary, display, all: contacts, formatted: displayParts };
-    }
-    
-    function getDoctorInfo(tags) {
-      const medicalInfo = {
-        chiefDoctor: null,
-        specialists: [],
-        departments: [],
-        services: []
-      };
-      
-      // Chief doctor information
-      if (tags?.['chief_doctor'] || tags?.['medical:chief'] || tags?.['doctor:head']) {
-        medicalInfo.chiefDoctor = tags['chief_doctor'] || tags['medical:chief'] || tags['doctor:head'];
-      }
-      
-      // Medical specialties
-      if (tags?.['healthcare:speciality']) {
-        const specialties = tags['healthcare:speciality'].split(';');
-        specialties.forEach(specialty => {
-          medicalInfo.specialists.push(`Dr. ${specialty.trim()} Specialist`);
-        });
-      }
-      
-      // Departments and services
-      if (tags?.['medical:speciality']) medicalInfo.departments.push(`${tags['medical:speciality']} Department`);
-      if (tags?.['emergency:speciality']) medicalInfo.departments.push(`Emergency ${tags['emergency:speciality']}`);
-      if (tags?.department) medicalInfo.departments.push(`${tags.department} Department`);
-      if (tags?.['medical:department']) medicalInfo.departments.push(`${tags['medical:department']} Department`);
-      if (tags?.['medical:service']) medicalInfo.services.push(tags['medical:service']);
-      
-      // Build comprehensive doctor information
-      const doctorList = [];
-      
-      // Add chief doctor only if available in data
-      if (medicalInfo.chiefDoctor) {
-        doctorList.push(`👨‍⚕️ Chief Doctor: Dr. ${medicalInfo.chiefDoctor}`);
-      }
-      
-      // Add specialists only if available in data
-      if (medicalInfo.specialists.length > 0) {
-        medicalInfo.specialists.forEach(specialist => {
-          doctorList.push(`🩺 ${specialist}`);
-        });
-      }
-      
-      // Add departments
-      if (medicalInfo.departments.length > 0) {
-        medicalInfo.departments.forEach(dept => {
-          doctorList.push(`🏥 ${dept}`);
-        });
-      }
-      
-      // Add services
-      if (medicalInfo.services.length > 0) {
-        medicalInfo.services.forEach(service => {
-          doctorList.push(`⚕️ ${service}`);
-        });
-      }
-      
-      // Only show generic departments if no specific doctor information is available
-      if (doctorList.length === 0 && tags?.amenity === 'hospital') {
-        doctorList.push("📞 Contact hospital directly for doctor information and appointments");
-      }
-      
-      return doctorList;
-    }
-    
-    function getHospitalType(tags) {
-      if (tags?.['healthcare']) return `Healthcare: ${tags['healthcare']}`;
-      if (tags?.['hospital:type']) return `${tags['hospital:type']} Hospital`;
-      if (tags?.['medical:type']) return `${tags['medical:type']}`;
-      if (tags?.emergency === 'yes') return "Emergency Hospital";
-      if (tags?.['hospital:emergency']) return "Emergency Hospital";
-      return "General Hospital";
-    }
-    
-    function getOperatingHours(tags) {
-      if (tags?.['opening_hours']) return tags['opening_hours'];
-      if (tags?.['service_times']) return tags['service_times'];
-      if (tags?.emergency === 'yes') return "24/7 Emergency";
-      return null;
-    }
-    
-    function getFacilities(tags) {
-      const facilities = [];
-      
-      if (tags?.wheelchair === 'yes') facilities.push('♿ Wheelchair Access');
-      if (tags?.parking === 'yes') facilities.push('🅿️ Parking');
-      if (tags?.['parking:disabled'] === 'yes') facilities.push('♿🅿️ Disabled Parking');
-      if (tags?.emergency === 'yes') facilities.push('🚑 Emergency');
-      if (tags?.['emergency:covid19']) facilities.push('🦠 COVID-19');
-      if (tags?.pharmacy === 'yes') facilities.push('💊 Pharmacy');
-      if (tags?.laboratory === 'yes') facilities.push('🔬 Laboratory');
-      if (tags?.radiology === 'yes') facilities.push('📡 Radiology');
-      if (tags?.surgery === 'yes') facilities.push('🔪 Surgery');
-      if (tags?.maternity === 'yes') facilities.push('👶 Maternity');
-      if (tags?.dialysis === 'yes') facilities.push('🩸 Dialysis');
-      if (tags?.['intensive_care'] === 'yes') facilities.push('🏥 ICU');
-      if (tags?.ambulance === 'yes') facilities.push('🚑 Ambulance');
-      if (tags?.['blood_bank'] === 'yes') facilities.push('🩸 Blood Bank');
-      if (tags?.mortuary === 'yes') facilities.push('⚰️ Mortuary');
-      if (tags?.beds) facilities.push(`🛏️ ${tags.beds} Beds`);
-      if (tags?.capacity) facilities.push(`👥 Capacity: ${tags.capacity}`);
-      
-      return facilities;
-    }
-    
-    function buildAddress(tags) {
-      if (!tags) return "Address not available";
-      
-      const parts = [];
-      if (tags['addr:housenumber']) parts.push(tags['addr:housenumber']);
-      if (tags['addr:street']) parts.push(tags['addr:street']);
-      if (tags['addr:suburb'] || tags['addr:neighbourhood']) parts.push(tags['addr:suburb'] || tags['addr:neighbourhood']);
-      if (tags['addr:city']) parts.push(tags['addr:city']);
-      if (tags['addr:state']) parts.push(tags['addr:state']);
-      if (tags['addr:postcode']) parts.push(tags['addr:postcode']);
-      
-      return parts.length > 0 ? parts.join(', ') : "Address not available";
-    }
-    
-    function callHospital(phoneNumber) {
-      if (phoneNumber && phoneNumber !== "Not available") {
-        // Clean the phone number for calling
-        const cleanPhone = phoneNumber.replace(/[^+\d]/g, '');
-        window.location.href = `tel:${cleanPhone}`;
-      } else {
-        alert("📞 Phone number not available in Google Maps for this hospital.\n\n💡 Try:\n• Search online for hospital contact\n• Call directory assistance\n• Visit hospital website");
-      }
-    }
-    
-    function showHospitalDetails(name, rating, totalRatings, phone) {
-      const message = `Hospital: ${name}\n\nRating: ${rating}⭐ out of 5\nTotal Reviews: ${totalRatings}\nPhone: ${phone}\n\nThis hospital has been rated by real patients. Call for appointments and consultations.`;
-      alert(message);
-    }
-    
-    function getDirections(lat, lon) {
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-      window.open(url, '_blank');
-    }
-
-    function setMarker(lat, lon) {
-      if (marker) marker.setLatLng([lat, lon]);
-      else {
-        marker = L.marker([lat, lon], { draggable: true }).addTo(map);
-        marker.on("dragend", (e) => {
-          const pos = e.target.getLatLng();
-          reverseGeocode(pos.lat, pos.lng);
-        });
-      }
-      map.setView([lat, lon], 13);
-    }
-
-    function useMyLocation() {
-      if (!navigator.geolocation) return alert("Geolocation not supported.");
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        setMarker(lat, lon);
-        reverseGeocode(lat, lon);
-      }, error => {
-        alert("Could not get your location. Please try manual input.");
+        const item = document.createElement('div');
+        item.className = 'hospital-item';
+        item.innerHTML = `
+          <div class="h-name">${i+1}. ${name}</div>
+          <div class="h-meta">
+            <span>${dist} km away</span>${type?'<span class="h-badge">'+type+'</span>':''}
+          </div>
+          ${addr ? `<div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">${addr}</div>` : ''}
+          <div class="h-actions">
+            ${phone ? `<button class="h-btn primary" onclick="callHospital('${phone}')">Call</button>` : ''}
+            <button class="h-btn" onclick="getDirections(${elLat},${elLon})" style="${phone?'':'flex:1'}">Directions</button>
+            <button class="h-btn" onclick="showHospitalOnMap(${elLat},${elLon},${i})">Map</button>
+          </div>`;
+        item.addEventListener('click', () => showHospitalOnMap(elLat, elLon, i));
+        listEl.appendChild(item);
       });
+    } catch(e) {
+      setStatus('Failed to load hospitals. Check your connection.');
+      console.error(e);
     }
+  }
 
-    function showManualInput() {
-      document.getElementById("manualInput").style.display = "block";
-    }
+  function showHospitalOnMap(lat, lon, idx) {
+    map.setView([lat, lon], 15);
+    hospitalMarkers[idx]?.openPopup();
+    document.querySelectorAll('.hospital-item').forEach((el,i) => el.classList.toggle('active', i===idx));
+  }
 
-    function hideManualInput() {
-      document.getElementById("manualInput").style.display = "none";
-    }
+  function callHospital(phone) {
+    const clean = phone.replace(/\s/g,'');
+    window.location.href = 'tel:' + clean;
+  }
 
-    async function searchByAddress() {
-      const address = document.getElementById("addressInput").value.trim();
-      if (!address) {
-        alert("Please enter an address");
-        return;
-      }
+  function getDirections(lat, lon) {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+  }
 
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`);
-        const data = await response.json();
-        
-        if (data.length === 0) {
-          alert("Address not found. Please try a different address.");
-          return;
-        }
+  function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2-lat1)*Math.PI/180;
+    const dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+  }
 
-        const lat = parseFloat(data[0].lat);
-        const lon = parseFloat(data[0].lon);
-        
-        setMarker(lat, lon);
-        reverseGeocode(lat, lon);
-        hideManualInput();
-        
-      } catch (error) {
-        console.error('Error searching address:', error);
-        alert("Error searching for address. Please try again.");
-      }
-    }
+  function buildAddress(tags) {
+    if (!tags) return '';
+    return [tags['addr:street'], tags['addr:housenumber'], tags['addr:suburb'] || tags['addr:city']].filter(Boolean).join(', ');
+  }
 
-    function searchByCoordinates() {
-      const lat = parseFloat(document.getElementById("latInput").value);
-      const lon = parseFloat(document.getElementById("lonInput").value);
-      
-      if (isNaN(lat) || isNaN(lon)) {
-        alert("Please enter valid latitude and longitude values");
-        return;
-      }
-
-      if (lat < -90 || lat > 90) {
-        alert("Latitude must be between -90 and 90");
-        return;
-      }
-
-      if (lon < -180 || lon > 180) {
-        alert("Longitude must be between -180 and 180");
-        return;
-      }
-
-      setMarker(lat, lon);
-      reverseGeocode(lat, lon);
-      hideManualInput();
-    }
-
-    // Event listeners
-    document.getElementById("locBtn").addEventListener("click", useMyLocation);
-    document.getElementById("demoBtn").addEventListener("click", () => {
-      const lat = 13.0827, lon = 80.2707;
-      setMarker(lat, lon);
-      reverseGeocode(lat, lon);
-    });
-
-    document.getElementById("manualBtn").addEventListener("click", showManualInput);
-    document.getElementById("closeManualBtn").addEventListener("click", hideManualInput);
-    document.getElementById("searchAddressBtn").addEventListener("click", searchByAddress);
-    document.getElementById("searchCoordsBtn").addEventListener("click", searchByCoordinates);
-
-    document.getElementById("addressInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        searchByAddress();
-      }
-    });
-
-    document.getElementById("latInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        searchByCoordinates();
-      }
-    });
-    
-    document.getElementById("lonInput").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        searchByCoordinates();
-      }
-    });
-
-    map.on("click", e => {
-      const { lat, lng } = e.latlng;
-      setMarker(lat, lng);
-      reverseGeocode(lat, lng);
-    });
-
-    // Open the full hosted hospital finder when user clicks the button
-    document.getElementById('openFinderBtn').addEventListener('click', async () => {
-      // If served over HTTP, try to open the server path first
-      if (location.protocol === 'http:' || location.protocol === 'https:') {
-        try {
-          // quick head check to see if the hosted page exists at root
-          const resp = await fetch('/hospital-finder.html', { method: 'HEAD' });
-          if (resp.ok) {
-            window.location.href = '/hospital-finder.html';
-            return;
-          }
-        } catch (e) {
-          // ignore and try localhost fallback
-        }
-
-        // fallback to localhost:5000 (common dev server)
-        window.open('https://my-medicalapp.onrender.com/hospital-finder.html', '_blank');
-        return;
-      }
-
-      // If opened via file:// build a local file path to BACKEND/public/hospital-finder.html
-      if (location.protocol === 'file:') {
-        try {
-          const href = location.href.replace(/\\\\/g, '/');
-          // Attempt to replace FRONTEND folder with BACKEND/public
-          const target = href.replace(/\/FRONTEND\//i, '/BACKEND/public/').replace(/[^/]*$/, 'hospital-finder.html');
-          window.open(target, '_blank');
-        } catch (err) {
-          // As a last resort open the file via an absolute localhost URL in a new tab
-          window.open('https://my-medicalapp.onrender.com/hospital-finder.html', '_blank');
-        }
-      }
-    });
-
-    // Initialize with demo location
-    console.log('Hospital Finder initialized successfully');
-  </script>
+  function getHospitalType(tags) {
+    if (!tags) return '';
+    if (tags.emergency === 'yes') return 'Emergency';
+    if (tags.healthcare === 'clinic') return 'Clinic';
+    if (tags.beds) return tags.beds + ' beds';
+    return tags.operator_type || '';
+  }
+</script>
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');document.getElementById('navToggle').classList.toggle('open')}
+function checkAuth(){var t=localStorage.getItem('authToken'),info=JSON.parse(localStorage.getItem('userInfo')||'{}'),name=info.name||localStorage.getItem('userName')||'',btn=document.getElementById('authBtn'),chip=document.getElementById('navChip'),nm=document.getElementById('navName'),av=document.getElementById('navAv');if(t&&name){btn.textContent='Sign Out';btn.className='btn-nav outline';chip.classList.add('show');nm.textContent=name;av.textContent=name.charAt(0).toUpperCase()}else{btn.textContent='Sign In';btn.className='btn-nav primary';chip.classList.remove('show')}}
+function handleAuth(){if(localStorage.getItem('authToken')){if(confirm('Sign out of MediCare?')){localStorage.removeItem('authToken');localStorage.removeItem('userInfo');localStorage.removeItem('userName');checkAuth()}}else{window.location.href='login.html'}}
+window.addEventListener('load',checkAuth);
+</script>
+<script src="bento-glow.js"></script>
+<script src="gooey-buttons.js"></script>
 </body>
 </html>
-
-
-
