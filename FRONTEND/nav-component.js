@@ -73,6 +73,43 @@
   .mc-user-av{width:32px;height:32px;border-radius:50%;background:#0891B2;color:#fff;
     font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .mc-user-name{font-size:.85rem;font-weight:600;color:#fff}
+
+  /* ── CUSTOM CURSOR ──────────────────────────────── */
+  @media(pointer:fine){
+    *,*::before,*::after{cursor:none!important}
+  }
+  .target-cursor-wrapper{
+    position:fixed;top:0;left:0;width:0;height:0;
+    pointer-events:none;z-index:99999;
+  }
+  .target-cursor-dot{
+    position:absolute;left:50%;top:50%;
+    width:5px;height:5px;
+    background:#22D3EE;border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 6px #22D3EE,0 0 12px rgba(34,211,238,.5);
+  }
+  .target-cursor-corner{
+    position:absolute;left:50%;top:50%;
+    width:14px;height:14px;
+    border:2px solid #22D3EE;
+    transition:width .18s ease,height .18s ease,border-color .18s ease,opacity .2s;
+    box-shadow:0 0 4px rgba(34,211,238,.4);
+  }
+  .corner-tl{transform:translate(-150%,-150%);border-right:none;border-bottom:none}
+  .corner-tr{transform:translate(50%,-150%);border-left:none;border-bottom:none}
+  .corner-br{transform:translate(50%,50%);border-left:none;border-top:none}
+  .corner-bl{transform:translate(-150%,50%);border-right:none;border-top:none}
+  .target-cursor-wrapper.hover .target-cursor-corner{
+    width:24px;height:24px;
+    border-color:#fff;
+    box-shadow:0 0 6px rgba(255,255,255,.3)
+  }
+  .target-cursor-wrapper.hover .target-cursor-dot{
+    background:#fff;
+    box-shadow:0 0 6px #fff
+  }
+  .target-cursor-wrapper.click .target-cursor-corner{width:6px;height:6px}
   `;
 
   var styleEl = document.createElement('style');
@@ -221,12 +258,52 @@
   }
   window.mcHandleAuth = mcHandleAuth;
 
+  /* ── CUSTOM CURSOR ─────────────────────────────── */
+  function buildCursor(){
+    if(!window.matchMedia('(pointer:fine)').matches) return;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'target-cursor-wrapper';
+    wrap.innerHTML =
+      '<div class="target-cursor-dot"></div>'+
+      '<div class="target-cursor-corner corner-tl"></div>'+
+      '<div class="target-cursor-corner corner-tr"></div>'+
+      '<div class="target-cursor-corner corner-br"></div>'+
+      '<div class="target-cursor-corner corner-bl"></div>';
+    document.body.appendChild(wrap);
+
+    var mx = window.innerWidth/2, my = window.innerHeight/2;
+    var cx = mx, cy = my;
+    var HOVER_SEL = 'a,button,[role="button"],input,textarea,select,label';
+
+    document.addEventListener('mousemove', function(e){
+      mx = e.clientX; my = e.clientY;
+    });
+
+    document.addEventListener('mouseover', function(e){
+      if(e.target && e.target.closest(HOVER_SEL)) wrap.classList.add('hover');
+    });
+    document.addEventListener('mouseout', function(e){
+      if(e.target && e.target.closest(HOVER_SEL)) wrap.classList.remove('hover');
+    });
+    document.addEventListener('mousedown', function(){ wrap.classList.add('click'); });
+    document.addEventListener('mouseup',   function(){ wrap.classList.remove('click'); });
+
+    (function tick(){
+      cx += (mx - cx) * 0.12;
+      cy += (my - cy) * 0.12;
+      wrap.style.transform = 'translate('+cx.toFixed(2)+'px,'+cy.toFixed(2)+'px)';
+      requestAnimationFrame(tick);
+    })();
+  }
+
   /* ── INIT ────────────────────────────────────────── */
   function init(){
     buildNav();
     /* Wire toggle button after DOM insert */
     document.getElementById('mcToggle').onclick = mcToggle;
     mcCheckAuth();
+    buildCursor();
     /* Listen for storage changes (login from another tab) */
     window.addEventListener('storage', mcCheckAuth);
   }
