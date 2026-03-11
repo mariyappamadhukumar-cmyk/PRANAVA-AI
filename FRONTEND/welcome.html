@@ -369,6 +369,20 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .hero{animation:fadeUp .5s ease-out}
+
+/* ===== SCROLL REVEAL CLASSES ===== */
+.rv,.rv-l,.rv-r,.rv-s,.rv-pop{
+  will-change:transform,opacity;
+  transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1);
+}
+.rv    {opacity:0;transform:translateY(48px)}
+.rv-l  {opacity:0;transform:translateX(-60px)}
+.rv-r  {opacity:0;transform:translateX(60px)}
+.rv-s  {opacity:0;transform:scale(.93) translateY(24px);transition-timing-function:cubic-bezier(.34,1.4,.64,1)}
+.rv-pop{opacity:0;transform:scale(.85);transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.rv.in,.rv-l.in,.rv-r.in,.rv-s.in,.rv-pop.in{opacity:1;transform:none}
+.divider{transform-origin:left;transform:scaleX(0);transition:transform 1s cubic-bezier(.22,1,.36,1)}
+.divider.in{transform:scaleX(1)}
 /* Variable Proximity — Roboto Flex headings */
 .sec-heading,.feat-title,.cta-band h2{font-family:'Roboto Flex',sans-serif}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -748,7 +762,7 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 
 <script>
 function count(el,to){var n=0,s=Math.ceil(to/60),t=setInterval(function(){n=Math.min(n+s,to);el.textContent=n;if(n>=to)clearInterval(t)},24)}
-window.addEventListener('load',function(){count(document.getElementById('sAcc'),95);count(document.getElementById('sCon'),50);checkAuth();loadSavedReviews();});
+window.addEventListener('load',function(){checkAuth();loadSavedReviews();});
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');document.getElementById('navToggle').classList.toggle('open')}
 function nav(opt){
   var m={chatbot:'ai-chat.html',cough:'indexcough.html',doctor:'doctor-options.html',hospitals:'hospital.html'};
@@ -1139,6 +1153,168 @@ document.addEventListener('touchstart',function(e){
 document.addEventListener('touchmove',function(e){
   if(e.touches.length)applyVP(e.touches[0].clientX,e.touches[0].clientY);
 },{passive:true});
+
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCROLL ANIMATIONS — realistic reveal on scroll
+═══════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── Intersection Observer factory ─────────────────────── */
+function makeIO(cb,opts){
+  return new IntersectionObserver(cb, Object.assign({threshold:0.12,rootMargin:'0px 0px -40px 0px'},opts||{}));
+}
+
+/* ── Generic reveal observer ────────────────────────────── */
+var rvIO=makeIO(function(entries){
+  entries.forEach(function(e){
+    if(!e.isIntersecting)return;
+    var el=e.target,delay=el.dataset.delay||0;
+    setTimeout(function(){el.classList.add('in');},+delay);
+    rvIO.unobserve(el);
+  });
+});
+
+/* ── 1. DIVIDERS — grow left→right ──────────────────────── */
+document.querySelectorAll('.divider').forEach(function(el){
+  rvIO.observe(el);
+});
+
+/* ── 2. STATS — scale pop + counter on scroll ───────────── */
+var statsEl=document.querySelector('.stats');
+if(statsEl){
+  statsEl.classList.add('rv-s');
+  var statsTriggered=false;
+  makeIO(function(entries){
+    if(!entries[0].isIntersecting||statsTriggered)return;
+    statsTriggered=true;
+    statsEl.classList.add('in');
+    count(document.getElementById('sAcc'),95);
+    count(document.getElementById('sCon'),50);
+  }).observe(statsEl);
+}
+
+/* ── 3. SECTION INNER — fade up ─────────────────────────── */
+document.querySelectorAll('.section-inner').forEach(function(el){
+  /* We don't want to hide the whole section-inner, only its sub-parts */
+});
+
+/* ── 4. NUMBERED LIST ITEMS — stagger slide up ──────────── */
+document.querySelectorAll('.num-item').forEach(function(el,i){
+  el.classList.add('rv');
+  el.dataset.delay=i*90;
+  rvIO.observe(el);
+});
+
+/* ── 5. FEATURE ROWS — alternate left/right slide ───────── */
+document.querySelectorAll('.feat-row').forEach(function(el,i){
+  el.classList.add('rv-s');
+  el.dataset.delay=i*60;
+  rvIO.observe(el);
+  /* Visual panel slides from its side, text panel from opposite */
+  var visual=el.querySelector('.feat-visual');
+  var text=el.querySelector('.feat-text');
+  var isReverse=el.classList.contains('reverse');
+  if(visual){
+    visual.classList.add(isReverse?'rv-r':'rv-l');
+    visual.dataset.delay=(i*60)+80;
+    rvIO.observe(visual);
+  }
+  if(text){
+    text.classList.add(isReverse?'rv-l':'rv-r');
+    text.dataset.delay=(i*60)+160;
+    rvIO.observe(text);
+  }
+});
+
+/* ── 6. HOW-IT-WORKS STEPS — stagger scale pop ──────────── */
+document.querySelectorAll('.hiw-step').forEach(function(el,i){
+  el.classList.add('rv-s');
+  el.dataset.delay=i*130;
+  rvIO.observe(el);
+  var num=el.querySelector('.hiw-num');
+  if(num){num.classList.add('rv-pop');num.dataset.delay=i*130+200;rvIO.observe(num);}
+});
+
+/* ── 7. FEEDBACK CARDS — stagger cascade ────────────────── */
+document.querySelectorAll('.fb-card').forEach(function(el,i){
+  el.classList.add('rv-s');
+  el.dataset.delay=i*110;
+  rvIO.observe(el);
+});
+
+/* ── 8. FEEDBACK FORM ────────────────────────────────────── */
+var fbForm=document.querySelector('.fb-form-wrap');
+if(fbForm){fbForm.classList.add('rv');fbForm.dataset.delay=120;rvIO.observe(fbForm);}
+
+/* ── 9. CTA BAND — parallax + reveal ────────────────────── */
+var ctaBand=document.querySelector('.cta-band');
+if(ctaBand){
+  var ctaH2=ctaBand.querySelector('h2');
+  var ctaP=ctaBand.querySelector('p');
+  if(ctaH2)ctaH2.style.transition='none'; /* let splittext handle it */
+}
+
+/* ── 10. SEC-TAG + HEADINGS area containers ─────────────── */
+document.querySelectorAll('.sec-tag').forEach(function(el){
+  el.classList.add('rv');
+  el.dataset.delay=0;
+  /* re-use rvIO — sec-tag also gets tag-in from existing observer, union is fine */
+  rvIO.observe(el);
+});
+
+/* ── 11. PARALLAX on scroll ─────────────────────────────── */
+var ticking=false;
+function onScroll(){
+  if(ticking)return;
+  ticking=true;
+  requestAnimationFrame(function(){
+    var sy=window.scrollY;
+    /* Hero eyebrow badge subtle float up */
+    var eyebrow=document.querySelector('.hero-eyebrow');
+    if(eyebrow)eyebrow.style.transform='translateY('+(sy*0.08)+'px)';
+    /* Hero paragraph slower */
+    var heroP=document.querySelector('.hero-p');
+    if(heroP)heroP.style.transform='translateY('+(sy*0.04)+'px)';
+    /* Stats container */
+    var st=document.querySelector('.stats');
+    if(st)st.style.transform='translateY('+(sy*0.02)+'px) '+((st.style.transform||'').replace(/translateY\([^)]+\)/g,''));
+    ticking=false;
+  });
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+/* ── 12. FEAT-VISUAL inner icon — bounce on card hover ───── */
+document.querySelectorAll('.feat-big-ic').forEach(function(ic){
+  var row=ic.closest('.feat-row');
+  if(!row)return;
+  row.addEventListener('mouseenter',function(){
+    ic.style.transform='scale(1.12) rotate(-4deg)';
+    ic.style.transition='transform .35s cubic-bezier(.34,1.56,.64,1)';
+  });
+  row.addEventListener('mouseleave',function(){
+    ic.style.transform='';
+    ic.style.transition='transform .25s ease';
+  });
+});
+
+/* ── 13. HIW NUM — glow pulse on step enter view ────────── */
+var glowIO=makeIO(function(entries){
+  entries.forEach(function(e){
+    if(!e.isIntersecting)return;
+    var num=e.target;
+    num.style.animation='hiwPulse .6s cubic-bezier(.34,1.56,.64,1) forwards';
+    glowIO.unobserve(num);
+  });
+},{threshold:0.5});
+var hiwStyle=document.createElement('style');
+hiwStyle.textContent='@keyframes hiwPulse{0%{box-shadow:0 0 0 0 rgba(34,211,238,.5)}70%{box-shadow:0 0 0 18px rgba(34,211,238,0)}100%{box-shadow:0 0 28px rgba(8,145,178,.18)}}';
+document.head.appendChild(hiwStyle);
+document.querySelectorAll('.hiw-num').forEach(function(n){glowIO.observe(n);});
 
 })();
 </script>
