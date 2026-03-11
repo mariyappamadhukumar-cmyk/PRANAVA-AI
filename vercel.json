@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": null,
+  "outputDirectory": "FRONTEND",
+  "builds": [
+    { "src": "FRONTEND/**/*.html", "use": "@vercel/static" },
+    { "src": "FRONTEND/**/*.css", "use": "@vercel/static" },
+    { "src": "FRONTEND/**/*.js", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/FRONTEND/welcome.html" },
+    { "src": "/(.*)", "dest": "/FRONTEND/$1" }
+  ]
+}
