@@ -129,9 +129,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
 /* ===== PLASMA CANVAS ===== */
-#plasmaCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;
-  pointer-events:none;z-index:0;opacity:.28}
-.hero>*:not(#plasmaCanvas){position:relative;z-index:1}
+#plasmaCanvas{position:fixed;inset:0;width:100%;height:100%;display:block;
+  pointer-events:none;z-index:0;opacity:.18}
+.hero>*{position:relative;z-index:1}
+.page{position:relative;z-index:1}
+.nav{z-index:100}
 
 /* TRUE FOCUS */
 .focus-container{position:relative;display:flex;gap:.3em;justify-content:center;
@@ -151,7 +153,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
 .f-corner.br{bottom:-8px;right:-8px;border-left:none;border-top:none}
 
 /* ===== SECTION SHARED ===== */
-.section{padding:100px 24px}
+.section{padding:100px 24px;position:relative;z-index:1}
 .section-inner{max-width:1100px;margin:0 auto}
 .sec-tag{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--dim);border:1px solid var(--border);
@@ -293,15 +295,18 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
 @keyframes fbIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
 /* ===== CTA BAND ===== */
-.cta-band{background:var(--bg2);border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);padding:100px 24px;text-align:center}
+.cta-band{background:rgba(17,17,17,.55);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);padding:100px 24px;text-align:center;
+  position:relative;z-index:1;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .cta-band h2{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;
   letter-spacing:-.03em;margin-bottom:14px}
 .cta-band p{font-size:.95rem;color:var(--muted);max-width:460px;margin:0 auto 36px;line-height:1.7}
 
 /* ===== FOOTER ===== */
 footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-between;
-  gap:16px;flex-wrap:wrap;border-top:1px solid var(--border)}
+  gap:16px;flex-wrap:wrap;border-top:1px solid var(--border);
+  position:relative;z-index:1;background:rgba(8,8,8,.6);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .foot-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
 .foot-logo span{font-size:.85rem;font-weight:700;color:var(--muted)}
 .foot-logo b{color:var(--teal-lt)}
@@ -373,6 +378,7 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 </head>
 <body>
 
+<canvas id="plasmaCanvas"></canvas>
 <div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
 <aside class="sidebar" id="sidebar">
   <div class="sb-head">
@@ -436,7 +442,6 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 
   <!-- HERO -->
   <section class="hero">
-    <canvas id="plasmaCanvas"></canvas>
     <div class="hero-eyebrow">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
       AI-Powered Healthcare
@@ -914,25 +919,24 @@ document.getElementById('searchHospBtn').addEventListener('click',function(){win
   gl.uniform1f(uni('uMouseInteractive'),1);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-  var hero=canvas.parentElement;
   function resize(){
-    var r=hero.getBoundingClientRect(),sc=Math.min(.5,720/Math.max(1,r.width));
-    var w=Math.max(1,Math.floor(r.width*sc)),h=Math.max(1,Math.floor(r.height*sc));
+    var sc=Math.min(.5,720/Math.max(1,window.innerWidth));
+    var w=Math.max(1,Math.floor(window.innerWidth*sc)),h=Math.max(1,Math.floor(window.innerHeight*sc));
     canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);gl.uniform2f(uRes,w,h);
   }
-  var ro=new ResizeObserver(resize);ro.observe(hero);resize();
-  hero.addEventListener('mousemove',function(e){
-    var r=hero.getBoundingClientRect(),sc=canvas.width/r.width;
-    gl.uniform2f(uMouse,(e.clientX-r.left)*sc,(r.height-(e.clientY-r.top))*sc);
+  window.addEventListener('resize',resize);resize();
+  window.addEventListener('mousemove',function(e){
+    var sc=canvas.width/window.innerWidth;
+    gl.uniform2f(uMouse,e.clientX*sc,(window.innerHeight-e.clientY)*sc);
   });
   function setTouch(e){
     if(!e.touches.length)return;
-    var t=e.touches[0],r=hero.getBoundingClientRect(),sc=canvas.width/r.width;
-    gl.uniform2f(uMouse,(t.clientX-r.left)*sc,(r.height-(t.clientY-r.top))*sc);
+    var t=e.touches[0],sc=canvas.width/window.innerWidth;
+    gl.uniform2f(uMouse,t.clientX*sc,(window.innerHeight-t.clientY)*sc);
   }
-  hero.addEventListener('touchstart',setTouch,{passive:true});
-  hero.addEventListener('touchmove',setTouch,{passive:true});
-  hero.addEventListener('touchend',function(){
+  window.addEventListener('touchstart',setTouch,{passive:true});
+  window.addEventListener('touchmove',setTouch,{passive:true});
+  window.addEventListener('touchend',function(){
     gl.uniform2f(uMouse,canvas.width/2,canvas.height/2);
   },{passive:true});
   var t0=performance.now();
