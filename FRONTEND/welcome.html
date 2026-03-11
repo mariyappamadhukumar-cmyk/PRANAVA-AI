@@ -229,11 +229,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
 .hiw-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-.02em}
 .hiw-desc{font-size:.84rem;color:var(--muted);line-height:1.7;max-width:220px}
 @media(max-width:700px){
-  .hiw-grid{grid-template-columns:1fr;gap:40px}
+  .hiw-grid{grid-template-columns:1fr;gap:36px}
   .hiw-grid::before{display:none}
-  .hiw-step{flex-direction:row;text-align:left;gap:20px;align-items:flex-start}
-  .hiw-num{flex-shrink:0;width:52px;height:52px;font-size:1rem}
+  .hiw-step{flex-direction:row;text-align:left;gap:16px;align-items:flex-start}
+  .hiw-num{flex-shrink:0;width:48px;height:48px;font-size:.9rem}
   .hiw-icon{display:none}
+  .hiw-body{flex:1;min-width:0}
+  .hiw-title{font-size:.95rem;margin-bottom:5px}
+  .hiw-desc{font-size:.82rem;max-width:none}
 }
 
 /* ===== FEEDBACK ===== */
@@ -323,25 +326,40 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 /* ===== RESPONSIVE ===== */
 @media(max-width:768px){
   .nav-links{display:none}
-  .hero{padding:60px 20px 48px}
-  .section{padding:72px 20px}
-  .stats{flex-direction:column}
-  .stat{border-right:none;border-bottom:1px solid var(--border)}
-  .stat:last-child{border-bottom:none}
-  .num-item{grid-template-columns:56px 1fr}
+  .hero{padding:44px 20px 40px}
+  .section{padding:60px 20px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr)}
+  .stat{border-right:none;border-bottom:none;padding:18px 10px}
+  .stat:not(:last-child){border-right:1px solid var(--border)}
+  .stat-n{font-size:1.6rem}
+  .stat-l{font-size:.6rem}
+  .num-item{grid-template-columns:52px 1fr}
   footer{flex-direction:column;text-align:center}
-  .cta-band{padding:64px 20px}
+  .cta-band{padding:56px 20px}
   .fb-form-wrap{padding:28px 22px}
   .hiw-desc{max-width:none}
+  .sec-sub{margin-bottom:40px}
 }
 @media(max-width:480px){
   .hero-ctas{flex-direction:column;align-items:stretch}
   .btn-hero-p,.btn-hero-s{text-align:center}
-  .feat-visual,.feat-text{padding:28px 16px!important}
+  .feat-visual,.feat-text{padding:24px 16px!important}
+  .feat-title{font-size:1.35rem}
   .fb-card{padding:20px 16px}
   .fb-form-wrap{padding:22px 14px}
-  .sec-heading{letter-spacing:-.02em}
-  .focus-word{font-size:clamp(2.2rem,9vw,3.5rem)}
+  .sec-heading{letter-spacing:-.02em;font-size:clamp(1.5rem,5.5vw,2rem)}
+  .sec-sub{font-size:.88rem}
+  .focus-word{font-size:clamp(2.1rem,9vw,3.2rem)}
+  .cta-band h2{font-size:clamp(1.4rem,5.5vw,1.8rem);hyphens:none;-webkit-hyphens:none;word-break:normal;overflow-wrap:break-word}
+  .cta-band p{font-size:.85rem}
+  .stat{padding:14px 6px}
+  .stat-n{font-size:1.35rem}
+  .stat-l{font-size:.55rem}
+  .num-item{grid-template-columns:44px 1fr;gap:0 8px;padding:24px 0}
+  .num-idx{font-size:.65rem}
+  .hero{padding:36px 16px 32px}
+  .hero-p{font-size:.92rem;margin-bottom:32px}
+  .stats{margin-bottom:0}
 }
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -590,24 +608,30 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
           <div class="hiw-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           </div>
-          <div class="hiw-title">Describe your symptoms</div>
-          <p class="hiw-desc">Type or speak your symptoms naturally — just like talking to a doctor. No medical jargon needed.</p>
+          <div class="hiw-body">
+            <div class="hiw-title">Describe your symptoms</div>
+            <p class="hiw-desc">Type or speak your symptoms naturally — just like talking to a doctor. No medical jargon needed.</p>
+          </div>
         </div>
         <div class="hiw-step">
           <div class="hiw-num">02</div>
           <div class="hiw-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
           </div>
-          <div class="hiw-title">AI analyses instantly</div>
-          <p class="hiw-desc">Our AI engine cross-references your symptoms with thousands of medical cases in seconds — no waiting.</p>
+          <div class="hiw-body">
+            <div class="hiw-title">AI analyses instantly</div>
+            <p class="hiw-desc">Our AI engine cross-references your symptoms with thousands of medical cases in seconds — no waiting.</p>
+          </div>
         </div>
         <div class="hiw-step">
           <div class="hiw-num">03</div>
           <div class="hiw-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/></svg>
           </div>
-          <div class="hiw-title">Get clear guidance</div>
-          <p class="hiw-desc">Receive personalised recommendations — treatment steps, medication info, or a direct link to a real doctor.</p>
+          <div class="hiw-body">
+            <div class="hiw-title">Get clear guidance</div>
+            <p class="hiw-desc">Receive personalised recommendations — treatment steps, medication info, or a direct link to a real doctor.</p>
+          </div>
         </div>
       </div>
     </div>
