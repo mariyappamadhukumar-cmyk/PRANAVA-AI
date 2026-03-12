@@ -241,23 +241,78 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   .hiw-desc{font-size:.82rem;max-width:none}
 }
 
-/* ===== FEEDBACK ===== */
-.fb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
-.fb-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+/* ===== FEEDBACK CAROUSEL ===== */
+.fb-carousel-wrap{overflow:hidden;margin-top:40px;position:relative;}
+.fb-carousel-wrap::before,.fb-carousel-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;}
+.fb-carousel-wrap::before{left:0;background:linear-gradient(to right,var(--bg) 0%,transparent 100%)}
+.fb-carousel-wrap::after{right:0;background:linear-gradient(to left,var(--bg) 0%,transparent 100%)}
+.fb-track{
+  display:flex;gap:20px;
+  animation:fbScroll 28s linear infinite;
+  width:max-content;
+}
+.fb-track:hover{animation-play-state:paused}
+@keyframes fbScroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+.fb-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
   padding:28px 24px;display:flex;flex-direction:column;gap:14px;
+  width:320px;flex-shrink:0;
   transition:border-color .2s,box-shadow .2s}
 .fb-card:hover{border-color:rgba(8,145,178,.3);box-shadow:0 0 32px rgba(8,145,178,.07)}
 .fb-stars{display:flex;gap:3px}
 .fb-stars svg{width:14px;height:14px;fill:#fbbf24;color:#fbbf24}
-.fb-quote{font-size:.9rem;color:var(--muted);line-height:1.75;flex:1}
+.fb-quote{font-size:.88rem;color:var(--muted);line-height:1.75;flex:1}
 .fb-author{display:flex;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border)}
 .fb-av{width:36px;height:36px;border-radius:50%;background:rgba(8,145,178,.2);
   border:1px solid rgba(8,145,178,.3);display:flex;align-items:center;justify-content:center;
   font-size:.78rem;font-weight:800;color:var(--teal-lt);flex-shrink:0}
 .fb-name{font-size:.82rem;font-weight:700;color:#fff}
 .fb-role{font-size:.72rem;color:var(--dim)}
-@media(max-width:900px){.fb-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.fb-grid{grid-template-columns:1fr}}
+/* See All button */
+.fb-see-all{
+  display:flex;align-items:center;gap:8px;
+  margin:28px auto 0;padding:11px 28px;
+  background:transparent;border:1px solid rgba(255,255,255,.14);
+  border-radius:100px;color:rgba(255,255,255,.6);
+  font-size:.82rem;font-weight:600;cursor:pointer;
+  transition:border-color .2s,color .2s,background .2s;
+  font-family:inherit;
+}
+.fb-see-all:hover{border-color:#22D3EE;color:#22D3EE;background:rgba(34,211,238,.06)}
+.fb-see-all svg{width:14px;height:14px}
+/* All-reviews modal */
+.fb-modal-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20000;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s;
+}
+.fb-modal-ov.open{opacity:1;visibility:visible}
+.fb-modal-box{
+  background:#111;border:1px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:32px 28px;width:min(92vw,680px);max-height:78vh;
+  overflow-y:auto;position:relative;
+  box-shadow:0 24px 80px rgba(0,0,0,.7);
+}
+.fb-modal-box::-webkit-scrollbar{width:4px}
+.fb-modal-box::-webkit-scrollbar-track{background:transparent}
+.fb-modal-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.fb-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.fb-modal-head h3{font-size:1rem;font-weight:800;color:#fff}
+.fb-modal-close{
+  width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.07);
+  border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;
+}
+.fb-modal-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.fb-all-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:540px){.fb-all-grid{grid-template-columns:1fr}}
 
 /* ===== FEEDBACK FORM ===== */
 .fb-form-wrap{
@@ -423,64 +478,7 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 <body>
 
 <canvas id="plasmaCanvas"></canvas>
-<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
-<aside class="sidebar" id="sidebar">
-  <div class="sb-head">
-    <div class="sb-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
-    </div>
-    <div><div class="sb-title">MediCare</div><div class="sb-sub">Health Platform</div></div>
-  </div>
-  <div class="sb-label">Navigation</div>
-  <a href="ai-doctor.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>AI Doctor
-  </a>
-  <a href="ai-chat.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>AI Chat
-  </a>
-  <a href="indexcough.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>Cough Analysis
-  </a>
-  <a href="online-consultation.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-4l-2 4h8l-2-4zM12 12v4M10 14h4"/></svg>Book Doctor
-  </a>
-  <a href="hospital.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nearby Hospitals
-  </a>
-  <a href="health-dashboard.html" class="sb-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Health Dashboard
-  </a>
-  <div class="sb-foot">
-    <div class="sb-item red" onclick="handleAuth()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
-    </div>
-  </div>
-</aside>
 
-<!-- NAV -->
-<nav class="nav">
-  <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()">
-    <span></span><span></span><span></span>
-  </button>
-  <a href="#" class="nav-logo">
-    <div class="nav-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
-    </div>
-    <span class="nav-brand">Medi<b>Care</b></span>
-  </a>
-  <div class="nav-links">
-    <a href="ai-doctor.html">AI Doctor</a>
-    <a href="indexcough.html">Cough Analysis</a>
-    <a href="online-consultation.html">Book Doctor</a>
-    <a href="hospital.html">Hospitals</a>
-    <a href="health-dashboard.html">Dashboard</a>
-  </div>
-  <div class="nav-chip" id="navChip">
-    <div class="nav-av" id="navAv">U</div>
-    <span id="navName">User</span>
-  </div>
-  <button class="btn-nav primary" id="authBtn" onclick="handleAuth()">Sign In</button>
-</nav>
 
 <main class="page">
 
@@ -692,49 +690,16 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
   <div class="cta-band">
     <h2>Start your health journey today</h2>
     <p>Say goodbye to waiting rooms and unreliable search results. MediCare is built for everyone — not just those who can afford it.</p>
-    <div class="fb-grid" id="fbGrid">
-      <div class="fb-card">
-        <div class="fb-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="fb-quote">"I described my chest tightness and within seconds MediCare flagged it seriously and connected me to a doctor. Genuinely could have saved my life."</p>
-        <div class="fb-author">
-          <div class="fb-av">R</div>
-          <div><div class="fb-name">Ravi Shankar</div><div class="fb-role">Software Engineer, Chennai</div></div>
-        </div>
+    <div class="fb-carousel-wrap" id="fbCarouselWrap">
+      <div class="fb-track" id="fbTrack">
+        <!-- filled by JS: top 3 by stars, duplicated for seamless loop -->
       </div>
-      <div class="fb-card">
-        <div class="fb-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="fb-quote">"The cough analysis tool identified early signs of bronchitis before I even visited a clinic. The accuracy was impressive and the UI so clean."</p>
-        <div class="fb-author">
-          <div class="fb-av">P</div>
-          <div><div class="fb-name">Priya Nair</div><div class="fb-role">Teacher, Kochi</div></div>
-        </div>
-      </div>
-      <div class="fb-card">
-        <div class="fb-stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <p class="fb-quote">"As someone in a rural area with no easy clinic access, MediCare has been a lifeline. Available 24/7 and actually understands what I'm going through."</p>
-        <div class="fb-author">
-          <div class="fb-av">A</div>
-          <div><div class="fb-name">Arun Mehta</div><div class="fb-role">Farmer, Rajasthan</div></div>
-        </div>
-      </div>
+    </div>
+    <div style="text-align:center">
+      <button class="fb-see-all" id="fbSeeAll">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        See all feedback
+      </button>
     </div>
 
     <!-- LEAVE YOUR FEEDBACK -->
@@ -767,6 +732,18 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 
 </main>
 
+<!-- ALL FEEDBACK MODAL -->
+<div class="fb-modal-ov" id="fbModalOv">
+  <div class="fb-modal-box">
+    <div class="fb-modal-head">
+      <h3>All Feedback</h3>
+      <button class="fb-modal-close" id="fbModalClose">&#x2715;</button>
+    </div>
+    <div class="fb-all-grid" id="fbAllGrid"></div>
+    <p id="fbAllEmpty" style="color:rgba(255,255,255,.35);font-size:.85rem;text-align:center;padding:32px 0;display:none">No feedback yet — be the first!</p>
+  </div>
+</div>
+
 <footer>
   <a href="#" class="foot-logo">
     <div class="nav-mark" style="width:28px;height:28px">
@@ -792,27 +769,12 @@ footer{padding:40px 28px;display:flex;align-items:center;justify-content:space-b
 
 <script>
 function count(el,to){var n=0,s=Math.ceil(to/60),t=setInterval(function(){n=Math.min(n+s,to);el.textContent=n;if(n>=to)clearInterval(t)},24)}
-window.addEventListener('load',function(){checkAuth();loadSavedReviews();});
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');document.getElementById('navToggle').classList.toggle('open')}
+window.addEventListener('load',function(){loadSavedReviews();});
 function nav(opt){
   var m={chatbot:'ai-chat.html',cough:'indexcough.html',doctor:'doctor-options.html',hospitals:'hospital.html'};
   if(m[opt]){window.location.href=m[opt]}
 }
-function checkAuth(){
-  var t=localStorage.getItem('authToken'),
-      info=JSON.parse(localStorage.getItem('userInfo')||'{}'),
-      name=info.name||localStorage.getItem('userName')||'',
-      btn=document.getElementById('authBtn'),
-      chip=document.getElementById('navChip'),
-      nm=document.getElementById('navName'),
-      av=document.getElementById('navAv');
-  if(t&&name){btn.textContent='Sign Out';btn.className='btn-nav outline';chip.classList.add('show');nm.textContent=name;av.textContent=name.charAt(0).toUpperCase()}
-  else{btn.textContent='Sign In';btn.className='btn-nav primary';chip.classList.remove('show')}
-}
-function handleAuth(){
-  if(localStorage.getItem('authToken')){if(confirm('Sign out of MediCare?')){localStorage.removeItem('authToken');localStorage.removeItem('userInfo');localStorage.removeItem('userName');checkAuth()}}
-  else{window.location.href='login.html'}
-}
+
 document.getElementById('closeHospBtn').addEventListener('click',function(){document.getElementById('hospModal').classList.remove('show')});
 document.getElementById('openMapsBtn').addEventListener('click',function(){window.open('https://www.google.com/maps/search/hospitals+near+me','_blank')});
 document.getElementById('searchHospBtn').addEventListener('click',function(){window.open('https://www.google.com/maps/search/hospitals+near+me','_blank')});
@@ -821,6 +783,7 @@ document.getElementById('searchHospBtn').addEventListener('click',function(){win
 (function(){
   var starVal=0;
   var stars=document.querySelectorAll('#starPick svg');
+
   function setStars(v){
     starVal=v;
     stars.forEach(function(s){
@@ -846,27 +809,71 @@ document.getElementById('searchHospBtn').addEventListener('click',function(){win
     return s;
   }
 
-  function renderCard(r,prepend){
-    var grid=document.getElementById('fbGrid');
-    if(!grid)return;
+  function makeCard(r){
     var card=document.createElement('div');
-    card.className='fb-card'+(prepend?' fb-new':'');
+    card.className='fb-card';
     card.innerHTML=
       '<div class="fb-stars">'+starSVGs(r.stars)+'</div>'+
-      '<p class="fb-quote">\u201c'+r.msg+'\u201d</p>'+
+      '<p class="fb-quote">“'+r.msg+'”</p>'+
       '<div class="fb-author">'+
         '<div class="fb-av">'+r.name.trim().charAt(0).toUpperCase()+'</div>'+
         '<div><div class="fb-name">'+r.name+'</div><div class="fb-role">'+r.role+'</div></div>'+
       '</div>';
-    if(prepend&&grid.firstChild){grid.insertBefore(card,grid.firstChild);}
-    else{grid.appendChild(card);}
+    return card;
   }
 
-  function loadSavedReviews(){
-    var saved=JSON.parse(localStorage.getItem('mcReviews')||'[]');
-    saved.forEach(function(r){renderCard(r,false);});
+  /* render ALL reviews into scrolling carousel, newest first */
+  function renderCarousel(){
+    var track=document.getElementById('fbTrack');
+    if(!track)return;
+    var all=JSON.parse(localStorage.getItem('mcReviews')||'[]');
+    all.sort(function(a,b){ return b.ts-a.ts; });
+    track.innerHTML='';
+    if(all.length===0){
+      document.getElementById('fbCarouselWrap').style.display='none';
+      return;
+    }
+    document.getElementById('fbCarouselWrap').style.display='';
+    /* duplicate for seamless infinite loop — need at least enough cards to fill viewport twice */
+    var copies = all.length < 4 ? 4 : 2;
+    var combined=[];
+    for(var i=0;i<copies;i++) combined=combined.concat(all);
+    combined.forEach(function(r){ track.appendChild(makeCard(r)); });
+    /* scale speed: ~6s per unique card so pace stays consistent regardless of count */
+    var dur = Math.max(12, all.length * 6);
+    track.style.animationDuration = dur + 's';
   }
+
+  /* render all reviews into modal grid */
+  function renderAllModal(){
+    var grid=document.getElementById('fbAllGrid');
+    var empty=document.getElementById('fbAllEmpty');
+    if(!grid)return;
+    var all=JSON.parse(localStorage.getItem('mcReviews')||'[]');
+    all.sort(function(a,b){return b.ts-a.ts;});
+    grid.innerHTML='';
+    if(all.length===0){
+      grid.style.display='none'; empty.style.display='';
+    } else {
+      grid.style.display=''; empty.style.display='none';
+      all.forEach(function(r){ grid.appendChild(makeCard(r)); });
+    }
+  }
+
+  function loadSavedReviews(){ renderCarousel(); }
   window.loadSavedReviews=loadSavedReviews;
+
+  /* See All modal */
+  document.getElementById('fbSeeAll').addEventListener('click',function(){
+    renderAllModal();
+    document.getElementById('fbModalOv').classList.add('open');
+  });
+  document.getElementById('fbModalClose').addEventListener('click',function(){
+    document.getElementById('fbModalOv').classList.remove('open');
+  });
+  document.getElementById('fbModalOv').addEventListener('click',function(e){
+    if(e.target===this) this.classList.remove('open');
+  });
 
   document.getElementById('fbSubmit').addEventListener('click',function(){
     var name=document.getElementById('fbName').value.trim();
@@ -879,8 +886,8 @@ document.getElementById('searchHospBtn').addEventListener('click',function(){win
     var saved=JSON.parse(localStorage.getItem('mcReviews')||'[]');
     saved.unshift(review);
     localStorage.setItem('mcReviews',JSON.stringify(saved));
-    renderCard(review,true);
-    // reset
+    renderCarousel();
+    /* reset form */
     setStars(0);
     document.getElementById('fbName').value='';
     document.getElementById('fbRole').value='';
@@ -1013,6 +1020,7 @@ document.getElementById('searchHospBtn').addEventListener('click',function(){win
   });
 })();
 </script>
+<script src="nav-component.js"></script>
 <script src="bento-glow.js"></script>
 <script src="gooey-buttons.js"></script>
 
