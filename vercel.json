@@ -8,6 +8,7 @@
     { "src": "FRONTEND/**/*.js", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/api/(.*)", "dest": "https://my-medicalapp.onrender.com/api/$1" },
     { "src": "/", "dest": "/FRONTEND/welcome.html" },
     { "src": "/(.*)", "dest": "/FRONTEND/$1" }
   ]

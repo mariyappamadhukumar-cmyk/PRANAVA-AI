@@ -186,7 +186,8 @@ function result = cough_analysis(audioFilePath)
         end
         
         % ===== STEP 7: SAVE RESULTS AS JSON =====
-        resultFile = strrep(audioFilePath, '.wav', '_result.json');
+        [resultDir, resultBase, ~] = fileparts(audioFilePath);
+        resultFile = fullfile(resultDir, [resultBase '_result.json']);
         
         % Convert to JSON string
         jsonStr = jsonencode(result);
@@ -226,7 +227,8 @@ function result = cough_analysis(audioFilePath)
         
         % Try to save error result
         try
-            resultFile = strrep(audioFilePath, '.wav', '_result.json');
+            [resultDir, resultBase, ~] = fileparts(audioFilePath);
+            resultFile = fullfile(resultDir, [resultBase '_result.json']);
             jsonStr = jsonencode(result);
             fid = fopen(resultFile, 'w');
             if fid ~= -1

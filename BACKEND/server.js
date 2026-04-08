@@ -53,6 +53,13 @@ app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
 
+// Also expose the actively developed frontend from the sibling FRONTEND folder.
+const FRONTEND_DIR = path.join(__dirname, '..', 'FRONTEND');
+app.use('/app', express.static(FRONTEND_DIR));
+app.get('/app', (_req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'welcome.html'));
+});
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 6 * 1024 * 1024 }, // 6 MB
@@ -1859,7 +1866,9 @@ async function simulateMatlabCoughAnalysis(audioFile) {
 // Real MATLAB integration function
 async function callMatlabAnalysis(audioFile) {
   const { promises: fsPromises } = await import('fs');
-  const { exec } = await import('child_process');
+  const { exec, execFile } = await import('child_process');
+  const ffmpegStaticModule = await import('ffmpeg-static');
+  const ffmpegPath = ffmpegStaticModule.default || ffmpegStaticModule;
   
   try {
     // Save audio file temporarily - keep original extension
@@ -1879,6 +1888,40 @@ async function callMatlabAnalysis(audioFile) {
     await fsPromises.writeFile(tempFilePath, audioFile.buffer);
     
     console.log(`📁 Saved temp file: ${tempFilePath}`);
+
+    let analysisFilePath = tempFilePath;
+    const cleanupFiles = [tempFilePath];
+
+    // Convert browser-recorded formats (webm/ogg/mp3/...) to wav for MATLAB.
+    if (ext.toLowerCase() !== '.wav') {
+      const wavFilePath = path.join(tempDir, `cough_${Date.now()}_converted.wav`);
+      try {
+        if (!ffmpegPath) {
+          throw new Error('ffmpeg-static binary not found');
+        }
+        console.log(`🔁 Converting ${ext} to wav using ffmpeg...`);
+        await new Promise((resolve, reject) => {
+          execFile(
+            ffmpegPath,
+            ['-y', '-i', tempFilePath, '-ac', '1', '-ar', '44100', wavFilePath],
+            { windowsHide: true },
+            (ffmpegError, _stdout, stderr) => {
+              if (ffmpegError) {
+                const msg = (stderr || ffmpegError.message || '').toString().slice(-400);
+                reject(new Error(`ffmpeg conversion failed: ${msg}`));
+                return;
+              }
+              resolve();
+            }
+          );
+        });
+        analysisFilePath = wavFilePath;
+        cleanupFiles.push(wavFilePath);
+        console.log(`✅ Converted audio saved: ${wavFilePath}`);
+      } catch (convertErr) {
+        console.warn(`⚠️ Audio conversion failed, MATLAB may use fallback logic: ${convertErr.message}`);
+      }
+    }
     
     // Use MATLAB path from environment or default
     const matlabExe = MATLAB_PATH;
@@ -1896,7 +1939,7 @@ async function callMatlabAnalysis(audioFile) {
     const backendPath = __dirname;
     
     // Use the simpler cough_analysis.m which is self-contained
-    const matlabCommand = `"${matlabExe}" -batch "addpath('${backendPath}'); result = cough_analysis('${tempFilePath}'); exit"`;
+    const matlabCommand = `"${matlabExe}" -batch "addpath('${backendPath}'); result = cough_analysis('${analysisFilePath}'); exit"`;
     
     console.log(`🔬 Executing MATLAB analysis...`);
     console.log(`📁 MATLAB command: ${matlabCommand.substring(0, 150)}...`);
@@ -1916,8 +1959,8 @@ async function callMatlabAnalysis(audioFile) {
           if (stderr) console.warn('⚠️ MATLAB stderr:', stderr);
           
           // Read results file that MATLAB should create
-          const baseFilePath = tempFilePath.replace(ext, '');
-          const resultFile = `${baseFilePath}_result.json`;
+          const parsedInput = path.parse(analysisFilePath);
+          const resultFile = path.join(parsedInput.dir, `${parsedInput.name}_result.json`);
           
           // Parse MATLAB output - Check if result file exists FIRST
           let results;
@@ -1932,7 +1975,9 @@ async function callMatlabAnalysis(audioFile) {
               results = parseMatlabOutput(stdout);
             } catch (parseError) {
               console.error('❌ Failed to parse MATLAB output:', parseError);
-              await fsPromises.unlink(tempFilePath).catch(() => {});
+              for (const f of cleanupFiles) {
+                await fsPromises.unlink(f).catch(() => {});
+              }
               reject(new Error(`MATLAB parsing failed: ${parseError.message}`));
               return;
             }
@@ -1941,13 +1986,17 @@ async function callMatlabAnalysis(audioFile) {
           // Only report error if we couldn't get results
           if (error && !results) {
             console.error('❌ MATLAB execution error:', error.message);
-            await fsPromises.unlink(tempFilePath).catch(() => {}); // cleanup
+            for (const f of cleanupFiles) {
+              await fsPromises.unlink(f).catch(() => {});
+            }
             reject(new Error(`MATLAB execution failed: ${error.message}`));
             return;
           }
           
           // Clean up temp files
-          await fsPromises.unlink(tempFilePath).catch(() => {});
+          for (const f of cleanupFiles) {
+            await fsPromises.unlink(f).catch(() => {});
+          }
           try {
             await fsPromises.unlink(resultFile);
           } catch (e) {
