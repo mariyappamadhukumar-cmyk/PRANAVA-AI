@@ -3363,8 +3363,13 @@ app.put('/api/online-doctors/availability', authenticateToken, async (req, res) 
 });
 
 // -------------------------------------------------------------------------------------
-// Root endpoint
+// Root endpoint - Serve latest FRONTEND
 app.get('/', (req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'welcome.html'));
+});
+
+// API status endpoint
+app.get('/api/status', (req, res) => {
   res.json({ 
     message: 'Welcome to Pranava Health AI API',
     status: 'online',
