@@ -124,6 +124,7 @@
     {label:'Book Doctor',    href:'online-consultation.html',icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'},
     {label:'Hospitals',      href:'hospital.html',           icon:'<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>'},
     {label:'Dashboard',      href:'health-dashboard.html',   icon:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'},
+    {label:'Vaccination',    href:'#',                       icon:'<path d="M23 6l-9.5 9.5-4-4L1 18M23 6v12h-12"/>', action:'openVaccination'},
   ];
 
   function svgIcon(paths){
@@ -141,12 +142,14 @@
     /* nav links */
     var linksHtml = pages.map(function(p){
       var active = cur === p.href ? ' active' : '';
-      return '<a href="'+p.href+'" class="'+active+'">'+p.label+'</a>';
+      var onclick = p.action ? ' onclick="'+p.action+'(); return false;"' : '';
+      return '<a href="'+p.href+'" class="'+active+'"'+onclick+'>'+p.label+'</a>';
     }).join('');
 
     /* sidebar items */
     var sbItems = pages.map(function(p){
-      return '<a href="'+p.href+'" class="mc-sb-item">'+svgIcon(p.icon)+p.label+'</a>';
+      var onclick = p.action ? ' onclick="'+p.action+'(); return false;"' : '';
+      return '<a href="'+p.href+'" class="mc-sb-item"'+onclick+'>'+svgIcon(p.icon)+p.label+'</a>';
     }).join('');
 
     var nav = document.createElement('nav');
@@ -295,6 +298,17 @@
       requestAnimationFrame(tick);
     })();
   }
+
+  /* ── VACCINATION MODAL ──────────────────────────── */
+  function openVaccination(){
+    var panel = document.getElementById('vax-panel');
+    if(panel) {
+      panel.style.display = 'flex';
+    } else {
+      console.warn('Vaccination panel (vax-panel) not found');
+    }
+  }
+  window.openVaccination = openVaccination;
 
   /* ── INIT ────────────────────────────────────────── */
   function init(){

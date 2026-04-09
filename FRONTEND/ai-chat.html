@@ -95,26 +95,36 @@
     /* HIDDEN */
     .hidden{display:none!important}
     /* VACCINATION MODAL */
-    .vax-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9999}
-    .vax-card{width:min(880px,92vw);max-height:92vh;overflow:auto;background:var(--navy);color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
-    .vax-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .vax-title{font-weight:800;font-size:1.05rem}
-    .vax-badge{font-weight:500;opacity:.7;margin-left:.5rem}
-    .icon-btn{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:.3rem .55rem;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem}
-    .vax-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 12px}
+    .vax-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9998;padding:20px;overflow:hidden}
+    .vax-card{width:min(900px,90vw);height:fit-content;max-height:calc(100vh - 40px);overflow-y:scroll;overflow-x:hidden;background:var(--surface);color:#fff;border:1px solid rgba(8,145,178,.25);border-radius:14px;padding:24px;box-shadow:0 16px 60px rgba(0,0,0,.6);scrollbar-width:thin;scrollbar-color:var(--teal) rgba(8,145,178,.1)}
+    .vax-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(8,145,178,.2)}
+    .vax-title{font-weight:800;font-size:1.1rem;color:#fff}
+    .vax-badge{font-weight:500;opacity:.6;margin-left:.7rem;font-size:.8rem;color:rgba(255,255,255,.7)}
+    .icon-btn{border:1px solid rgba(8,145,178,.3);background:rgba(8,145,178,.08);color:var(--teal);border-radius:8px;padding:.4rem .7rem;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;transition:all .15s}
+    .icon-btn:hover{background:rgba(8,145,178,.15);border-color:var(--teal)}
+    .vax-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 14px}
     .vax-row{display:flex;flex-direction:column;gap:6px;font-size:.82rem}
-    .vax-row input{padding:.6rem .7rem;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-family:'Inter',sans-serif;outline:none}
+    .vax-row label{color:rgba(255,255,255,.8);font-weight:600}
+    .vax-row input{padding:.7rem .8rem;border:1px solid rgba(8,145,178,.3);border-radius:8px;background:rgba(8,145,178,.06);color:#fff;font-family:'Inter',sans-serif;outline:none;transition:all .15s}
+    .vax-row input:focus{border-color:var(--teal);background:rgba(8,145,178,.12);box-shadow:0 0 0 3px rgba(8,145,178,.08)}
     .vax-actions{grid-column:1/-1;display:flex;gap:8px}
-    .btn{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
-    .btn:hover{background:rgba(255,255,255,.18)}
-    .btn.ghost{background:transparent}
-    .vax-section{margin:.6rem 0;padding:.7rem;border:1px solid rgba(255,255,255,.12);border-radius:10px;font-size:.83rem}
-    .vax-section .title{font-weight:700;margin-bottom:.4rem}
-    .vax-chip{display:inline-block;padding:.2rem .5rem;border:1px dashed rgba(255,255,255,.3);border-radius:999px;margin:.15rem .25rem;opacity:.85;font-size:.78rem}
-    .vax-due{border-left:3px solid #f59e0b;padding-left:.6rem}
-    .vax-overdue{border-left:3px solid #ef4444;padding-left:.6rem}
-    .vax-upcoming{border-left:3px solid #10b981;padding-left:.6rem}
-    /* READABILITY */
+    .btn{padding:10px 18px;border-radius:9px;border:1px solid rgba(8,145,178,.3);background:rgba(8,145,178,.1);color:#fff;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+    .btn:hover{background:rgba(8,145,178,.2);border-color:var(--teal)}
+    .btn.ghost{background:transparent;border-color:rgba(255,255,255,.2)}
+    .vax-section{margin:.8rem 0;padding:.8rem;border:1px solid rgba(8,145,178,.2);border-radius:10px;background:rgba(8,145,178,.05);font-size:.83rem}
+    .vax-section .title{font-weight:700;margin-bottom:.5rem;color:var(--teal-lt)}
+    .vax-chip{display:inline-block;padding:.3rem .6rem;border:1px solid rgba(8,145,178,.3);border-radius:999px;margin:.15rem .25rem;opacity:.9;font-size:.78rem;background:rgba(8,145,178,.08);color:rgba(255,255,255,.8)}
+    .vax-due{border-left:3px solid #f59e0b;padding-left:.8rem;background:rgba(245,158,11,.08)}
+    .vax-overdue{border-left:3px solid #ef4444;padding-left:.8rem;background:rgba(239,68,68,.08)}
+    .vax-upcoming{border-left:3px solid #10b981;padding-left:.8rem;background:rgba(16,185,129,.08)}
+    /* Scrollbar styling for vaccination modal */
+    .vax-card::-webkit-scrollbar{width:8px}
+    .vax-card::-webkit-scrollbar-track{background:transparent}
+    .vax-card::-webkit-scrollbar-thumb{background:rgba(8,145,178,.4);border-radius:4px}
+    .vax-card::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+    /* Prevent body scroll when modal is open */
+    body.vax-open{overflow:hidden}
+    /* Readability */
     :root{--advice-line:1.68;--advice-letter:.2px;--advice-word:.4px;--advice-li-gap:.50rem;--advice-p-gap:.55rem;--advice-measure:74ch}
     .advice,.vax-section{text-align:left;line-height:var(--advice-line);letter-spacing:var(--advice-letter);word-spacing:var(--advice-word);max-width:var(--advice-measure)}
     .advice-title,.section-title{margin-bottom:.55rem;line-height:1.25;letter-spacing:.25px}
@@ -189,6 +199,7 @@
   <a href="online-consultation.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-4l-2 4h8l-2-4z"/></svg>Book Doctor</a>
   <a href="hospital.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nearby Hospitals</a>
   <a href="health-dashboard.html" class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Health Dashboard</a>
+  <a href="#" id="btn-vax" class="sb-item" onclick="event.preventDefault(); document.getElementById('vax-panel').style.display='flex';" style="color:var(--teal); border-left-color:var(--teal);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-4-4L1 18M23 6v12h-12"/></svg>Vaccination Info</a>
   <div class="sb-foot"><div class="sb-item red" onclick="handleAuth()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div></div>
 </aside>
 <script src="nav-component.js"></script>
@@ -1642,6 +1653,7 @@
     openBtn.addEventListener('click', function(e){
       e.preventDefault();                   // don't submit any surrounding form
       panel.style.display = 'flex';
+      document.body.classList.add('vax-open');
       // Restore saved data
       try{
         const s = JSON.parse(localStorage.getItem('vax_user')||'{}');
@@ -1655,11 +1667,17 @@
     });
 
     // close
-    if (closeBtn) closeBtn.addEventListener('click', ()=> panel.style.display = 'none');
+    if (closeBtn) closeBtn.addEventListener('click', ()=> {
+      panel.style.display = 'none';
+      document.body.classList.remove('vax-open');
+    });
 
     // click outside card to close
     panel.addEventListener('click', (e)=>{
-      if (e.target === panel) panel.style.display = 'none';
+      if (e.target === panel) {
+        panel.style.display = 'none';
+        document.body.classList.remove('vax-open');
+      }
     });
 
     // Enhanced form submit handler
@@ -1693,8 +1711,14 @@
     });
 
     // expose for other code (optional)
-    window.openVaccination = () => panel.style.display = 'flex';
-    window.closeVaccination = () => panel.style.display = 'none';
+    window.openVaccination = () => {
+      panel.style.display = 'flex';
+      document.body.classList.add('vax-open');
+    };
+    window.closeVaccination = () => {
+      panel.style.display = 'none';
+      document.body.classList.remove('vax-open');
+    };
   });
   </script>
 
